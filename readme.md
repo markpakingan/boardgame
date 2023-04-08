@@ -1,0 +1,1 @@
+https://www.boardgameatlas.com/api/docs
