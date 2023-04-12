@@ -28,6 +28,26 @@ class Game(db.Model):
 
     gamelists = db.relationship("GameList", secondary = "game_gamelists", backref = "games")
 
+class GameList(db.Model):
+
+    __tablename__ = "gamelists"
+
+    id = db.Column (db.Integer, primary_key = True, autoincrement = True)
+    name = db.Column (db.Text, nullable = False)
+    description = db.Column (db.Text, nullable = False)
+    user_id = db.Column (db.Text, db.ForeignKey("users.id"),nullable = False)
+
+
+class Game_Gamelist (db.Model):
+
+    __tablename__ = "game_gamelists"
+
+    id = db.Column (db.Integer, primary_key = True, autoincrement = True)
+    game_id = db.Column (db.Integer, db.ForeignKey("games.id"), nullable = False)
+    user_id = db.Column (db.Integer, db.ForeignKey("users.id"), nullable = False)
+
+
+
 class Video(db.Model):
 
     __tablename__= "videos"
@@ -63,17 +83,6 @@ class User(db.Model):
     password = db.Column (db.Text, nullable = False)
     image_url = db.Column (db.Text, nullable = True)
     email = db.Column(db.Text, nullable = False)
-
-
-class GameList(db.Model):
-
-    __tablename__ = "gamelists"
-
-    id = db.Column (db.Integer, primary_key = True, autoincrement = True)
-    name = db.Column (db.Text, nullable = False)
-    description = db.Column (db.Text, nullable = False)
-    user_id = db.Column (db.Text, db.ForeignKey("users.id"),nullable = False)
-
 
     @classmethod
     def signup(cls, username, email, password, image_url):
@@ -113,17 +122,7 @@ class GameList(db.Model):
                 return user
 
         return False
-
-
-class Game_Gamelist (db.Model):
-
-    __tablename__ = "game_gamelists"
-
-    id = db.Column (db.Integer, primary_key = True, autoincrement = True)
-    game_id = db.Column (db.Integer, db.ForeignKey("games.id"), nullable = False)
-    user_id = db.Column (db.Integer, db.ForeignKey("users.id"), nullable = False)
-
-
+    
 
 def connect_db(app):
     """Connect this database to provided Flask app.
