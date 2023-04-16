@@ -1,11 +1,20 @@
 import os
+import requests
 
 from flask import Flask, render_template, request, flash, redirect, session, g, abort
 from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
 
-from forms import UserAddForm, LoginForm
+
+
+from forms import UserAddForm, LoginForm, GameListForm
 from models import db, connect_db, Game, User, Image, Video, Review, Game_Gamelist, GameList
+
+
+
+API_BASE_URL = "https://api.boardgameatlas.com/api"
+key = "TAAifFP590,OIXt3DmJU0"
+client_id = "Ctqu3FqFnC"
 
 CURR_USER_KEY = "curr_user"
 
@@ -37,7 +46,6 @@ def add_user_to_g():
 
     if CURR_USER_KEY in session: 
         g.user = User.query.get(session[CURR_USER_KEY])
-        # print("g.user is set:", g.user)
     else: 
         g.user = None
 
@@ -115,8 +123,6 @@ def login():
 def logout():
     """Handle logout of user."""
 
-    #implement this
-
     flash ("You have been logout!")
     do_logout()
     return redirect ("/")
@@ -136,3 +142,139 @@ def homepage():
 
         return render_template ("home-anon.html")
 
+##############################################################################
+# API FUNCTIONS
+
+def get_names(name):
+    """get boardgame names based on searchquery"""
+
+    
+    res = requests.get(f"{API_BASE_URL}/search", 
+                       params = {'name': name, 'client_id': client_id })
+
+    data = res.json()
+
+    name1 = data["games"][0]["name"]
+    name2 = data["games"][1]["name"]
+    name3 = data["games"][2]["name"]
+    name4 = data["games"][3]["name"]
+
+    id1 = data["games"][0]["id"]
+    id2 = data["games"][1]["id"]
+    id3 = data["games"][2]["id"]
+    id4 = data["games"][3]["id"]
+
+    # names = {"name1": name1, "name2": name2, "name3": name3, "name4": name4}
+    name_and_id = {"name1": name1, 
+                        "name2": name2, 
+                        "name3": name3, 
+                        "name4": name4, 
+                        "id1": id1,
+                        "id2": id2,
+                        "id3": id3, 
+                        "id4": id4
+                        }
+    return name_and_id
+
+
+def get_boardgame_details(name):
+    """Retrieve game details based on game_id, e.g., using an API call or from a database"""
+
+    res = requests.get(f"{API_BASE_URL}/search", 
+                       params = {'name': name, 'client_id': client_id })
+
+    data = res.json()
+
+    name = data["games"][0]["name"]
+    description = data["games"][0]["description"]
+    lowest_price = data["games"][0]["price"]
+    year_published = data["games"][0]["year_published"]
+    MSRP = data["games"][0]["msrp"]
+    players =data["games"][0]["players"]
+    mechanics = data["games"][0]["mechanics"][0]["url"]
+    artist = data["games"][0]["artists"][0]
+
+
+    game_details = {"name": name, "description": description, "lowest_price": lowest_price, 
+                    "year_published": year_published, "MSRP": MSRP, "players": players,
+                    "mechanics": mechanics, "artist": artist}
+    
+    return game_details
+
+##############################################################################
+# BOARD GAME ROUTE
+
+
+@app.route('/boardgamelist')
+def get_boardgamelist():
+    name = request.args["name"]
+    API_BASE_URL = "https://api.boardgameatlas.com/api"
+    client_id = "Ctqu3FqFnC"
+    
+    name_and_id = get_names(name)
+
+
+    return render_template("home.html", name_and_id = name_and_id)
+
+    # import pdb; pdb.set_trace()
+
+
+@app.route("/boardgame/<int:game_id>")
+def show_boardgame_details():
+    
+   
+
+##############################################################################
+
+# USER PROFILE ROUTE
+
+
+@app.route('/user/<int:user_id>')
+def check_user_profile(user_id):
+    """Show user profile"""
+
+    
+
+    if not g.user:
+       flash ("You are not authorized to view this!", "danger")
+       return redirect("/")
+       
+    user = User.query.get_or_404(user_id)
+    return render_template("users/userprofile.html", user = user)
+
+
+
+@app.route('/user/<int:user_id>/games')
+def show_games(user_id):
+    """Show list of games from the user"""
+
+    if not g.user: 
+       flash ("You are not authorized to view this!", "danger")
+       return redirect("/")
+       
+    user = User.query.get_or_404(user_id)
+    return render_template("users/games.html", user = user)
+
+
+
+# @app.route('/user/add-game', methods = ["GET", "POST"])
+# def add_user_games():
+#     """adds gameslist to user's profile"""
+
+    
+#     form = GameListForm()
+
+#     if form.validate_on_submit():
+#         name = form.name.data
+#         description = form.description.data
+
+#         game = Game(name = name, description = description)
+
+#         db.session.add(game)
+#         db.session.commit()
+
+#         return redirect("/user/<int:user_id>/gamelist")
+    
+#     else: 
+
+#         return render_template("users/add_game.html", form = form)

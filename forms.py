@@ -17,3 +17,9 @@ class LoginForm(FlaskForm):
 
     username = StringField("Username", validators=[DataRequired()])
     password = PasswordField("Password", validators=[Length(min=6)])
+
+
+class GameListForm(FlaskForm):
+
+    name = StringField("Name",validators=[DataRequired()])
+    description = StringField("Description",validators=[DataRequired()])

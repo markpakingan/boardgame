@@ -26,7 +26,7 @@ class Game(db.Model):
     mechanics = db.Column(db.Text, nullable = False )
     artists= db.Column(db.Text, nullable = False )
 
-    gamelists = db.relationship("GameList", secondary = "game_gamelists", backref = "games")
+    # gamelists = db.relationship("GameList", secondary = "game_gamelists", backref = "games")
 
 class GameList(db.Model):
 

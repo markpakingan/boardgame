@@ -26,7 +26,7 @@
     <ul>
       {% if request.endpoint != None %}
       <li>
-        <form action="/users">
+        <form action="/user">
           <input name="q">
           <button class="btn btn-default">
             <span class="fa fa-search"></span>
@@ -42,7 +42,7 @@
       {% else %}
 
       <li>
-        <a href="/users/{{ g.user.id }}">
+        <a href="/user/{{ g.user.id }}">
           <img src="{{ g.user.image_url }}" alt="{{ g.user.username }}">
         </a>
       </li>
