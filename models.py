@@ -15,7 +15,7 @@ class Game(db.Model):
     __tablename__ = "games"
 
     id = db.Column(db.Integer, primary_key = True, autoincrement = True)
-    game_sku_id = db.Column (db.Text, nullable = False)
+    game_sku_id = db.Column (db.Text, nullable = True)
     name = db.Column(db.Text, nullable = False )
     description = db.Column(db.Text, nullable = False )
     lowest_price = db.Column(db.Float, nullable = False )

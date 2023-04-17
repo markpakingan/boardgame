@@ -18,10 +18,14 @@
 
             {% if name_and_id %}
                     <ul>
-                        <li>{{name_and_id["name1"]}} (ID # {{name_and_id["id1"]}})</li>
-                        <li>{{name_and_id["name2"]}} (ID # {{name_and_id["id2"]}})</li>
-                        <li>{{name_and_id["name3"]}} (ID # {{name_and_id["id3"]}})</li>
-                        <li>{{name_and_id["name4"]}} (ID # {{name_and_id["id4"]}})</li>
+                        <li><a href='/boardgamelist/{{name_and_id["id1"]}}'>
+                            {{name_and_id["name1"]}} (ID # {{name_and_id["id1"]}})</a></li>
+                        <li><a href='/boardgamelist/{{name_and_id["id2"]}}'>
+                            {{name_and_id["name2"]}} (ID # {{name_and_id["id2"]}})</a></li>
+                        <li><a href='/boardgamelist/{{name_and_id["id3"]}}'>
+                            {{name_and_id["name3"]}} (ID # {{name_and_id["id3"]}})</a></li>
+                        <li><a href='/boardgamelist/{{name_and_id["id4"]}}'>
+                            {{name_and_id["name4"]}} (ID # {{name_and_id["id4"]}})</a></li>
                     </ul> 
             {% endif %}
         

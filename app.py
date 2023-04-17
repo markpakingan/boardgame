@@ -148,7 +148,6 @@ def homepage():
 def get_names(name):
     """get boardgame names based on searchquery"""
 
-    
     res = requests.get(f"{API_BASE_URL}/search", 
                        params = {'name': name, 'client_id': client_id })
 
@@ -176,31 +175,6 @@ def get_names(name):
                         }
     return name_and_id
 
-
-def get_boardgame_details(name):
-    """Retrieve game details based on game_id, e.g., using an API call or from a database"""
-
-    res = requests.get(f"{API_BASE_URL}/search", 
-                       params = {'name': name, 'client_id': client_id })
-
-    data = res.json()
-
-    name = data["games"][0]["name"]
-    description = data["games"][0]["description"]
-    lowest_price = data["games"][0]["price"]
-    year_published = data["games"][0]["year_published"]
-    MSRP = data["games"][0]["msrp"]
-    players =data["games"][0]["players"]
-    mechanics = data["games"][0]["mechanics"][0]["url"]
-    artist = data["games"][0]["artists"][0]
-
-
-    game_details = {"name": name, "description": description, "lowest_price": lowest_price, 
-                    "year_published": year_published, "MSRP": MSRP, "players": players,
-                    "mechanics": mechanics, "artist": artist}
-    
-    return game_details
-
 ##############################################################################
 # BOARD GAME ROUTE
 
@@ -208,20 +182,43 @@ def get_boardgame_details(name):
 @app.route('/boardgamelist')
 def get_boardgamelist():
     name = request.args["name"]
-    API_BASE_URL = "https://api.boardgameatlas.com/api"
-    client_id = "Ctqu3FqFnC"
     
     name_and_id = get_names(name)
-
-
     return render_template("home.html", name_and_id = name_and_id)
 
     # import pdb; pdb.set_trace()
 
+@app.route('/boardgamelist/<game_official_id>')
+def get_selected_boardgame(game_official_id):
 
-@app.route("/boardgame/<int:game_id>")
-def show_boardgame_details():
+    res = requests.get(f"{API_BASE_URL}/search", 
+                       params = {'ids': game_official_id, 'client_id': client_id })
     
+    # import pdb; pdb.set_trace()
+    data = res.json()
+
+    name = data["games"][0]["name"]
+    description = data["games"][0]["description"]
+    lowest_price = data["games"][0]["price"]
+    year_published = data["games"][0]["year_published"]
+    MSRP = data["games"][0]["msrp"]
+    min_players =data["games"][0]["min_players"]
+    max_players =data["games"][0]["max_players"]
+    mechanics = data["games"][0].get("mechanics",None)
+    # artist = data["games"][0]["artists"][0]
+
+
+    game_details = {"name": name, "description": description, "lowest_price": lowest_price, 
+                    "year_published": year_published, "MSRP": MSRP, "min_players": min_players,
+                    "max_players": max_players,
+                    "mechanics": mechanics, 
+                    # "artist": artist
+                    }
+
+    return render_template ('boardgames/game_description.html',
+                           game_details = game_details
+                           )
+
    
 
 ##############################################################################
@@ -232,9 +229,6 @@ def show_boardgame_details():
 @app.route('/user/<int:user_id>')
 def check_user_profile(user_id):
     """Show user profile"""
-
-    
-
     if not g.user:
        flash ("You are not authorized to view this!", "danger")
        return redirect("/")
@@ -243,38 +237,24 @@ def check_user_profile(user_id):
     return render_template("users/userprofile.html", user = user)
 
 
-
-@app.route('/user/<int:user_id>/games')
-def show_games(user_id):
-    """Show list of games from the user"""
-
-    if not g.user: 
-       flash ("You are not authorized to view this!", "danger")
-       return redirect("/")
-       
-    user = User.query.get_or_404(user_id)
-    return render_template("users/games.html", user = user)
-
-
-
-# @app.route('/user/add-game', methods = ["GET", "POST"])
-# def add_user_games():
-#     """adds gameslist to user's profile"""
+@app.route('/user/<int:user_id>/add-game', methods = ["GET", "POST"])
+def add_user_games(user_id):
+    """adds gameslist to user's profile"""
 
     
-#     form = GameListForm()
+    form = GameListForm()
 
-#     if form.validate_on_submit():
-#         name = form.name.data
-#         description = form.description.data
+    if form.validate_on_submit():
+        name = form.name.data
+        description = form.description.data
 
-#         game = Game(name = name, description = description)
+        game = Game(name = name, description = description)
 
-#         db.session.add(game)
-#         db.session.commit()
+        db.session.add(game)
+        db.session.commit()
 
-#         return redirect("/user/<int:user_id>/gamelist")
+        return redirect("/user/<int:user_id>/add-game")
     
-#     else: 
+    else: 
 
-#         return render_template("users/add_game.html", form = form)
+        return render_template("boardgames/add_game.html", form = form)
