@@ -44,8 +44,12 @@ class Game_Gamelist (db.Model):
 
     id = db.Column (db.Integer, primary_key = True, autoincrement = True)
     game_id = db.Column (db.Integer, db.ForeignKey("games.id"), nullable = False)
+    
+    # This is incorrect
     user_id = db.Column (db.Integer, db.ForeignKey("users.id"), nullable = False)
-
+    
+    # This is what Raymon recommended
+    # gamelist_id = db.Column (db.Integer, db.ForeignKey("gamelists.id"), nullable = False)
 
 
 class Video(db.Model):

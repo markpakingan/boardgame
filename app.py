@@ -219,7 +219,52 @@ def get_selected_boardgame(game_official_id):
                            game_details = game_details
                            )
 
-   
+
+@app.route('/gamelist/<int:gamelist_id>/edit', methods=['GET', 'POST'])
+def edit_gamelist(gamelist_id):
+
+    gamelist = GameList.query.get_or_404(gamelist_id)
+    form = GameListForm(obj=gamelist)
+
+    if form.validate_on_submit():
+        form.populate_obj(gamelist)
+        db.session.commit()
+        flash('Gamelist updated!', 'success')
+        return redirect(f"/user/{g.user.id}")
+
+    return render_template('boardgames/edit.html', form=form, 
+                           gamelist=gamelist)
+
+
+
+@app.route('/gamelist/<int:gamelist_id>/delete', methods=['POST'])
+def delete_gamelist(gamelist_id):
+    """Deletes a single game"""
+
+    if not g.user:
+        flash ("You are not authorized to view this!", "danger")
+        return redirect("/")
+    
+
+    gamelist = GameList.query.get_or_404(gamelist_id)
+    
+    form = DeleteForm()
+
+    if form.validate_on_submit():
+        db.session.delete(gamelist)
+        db.session.commit()
+
+    return redirect(f"/user/{g.user.id}")
+
+##############################################################################
+
+@app.route('/gamelist/<int:gamelist_id>/review')
+def show_review(gamelist_id):
+
+    gamelist = GameList.query.get_or_404(gamelist_id)
+
+    return render_template("review/show_review.html", gamelist = gamelist)
+
 
 ##############################################################################
 
@@ -234,7 +279,11 @@ def check_user_profile(user_id):
        return redirect("/")
        
     user = User.query.get_or_404(user_id)
-    return render_template("users/userprofile.html", user = user)
+    gamelists = GameList.query.filter_by(user_id = user_id).all()
+
+ 
+    return render_template("users/userprofile.html", user = user,
+                            gamelists = gamelists)
 
 
 @app.route('/user/<int:user_id>/add-game', methods = ["GET", "POST"])
@@ -253,8 +302,12 @@ def add_user_games(user_id):
         db.session.add(game)
         db.session.commit()
 
-        return redirect("/user/<int:user_id>/add-game")
+        # for testing
+        gamelists = GameList.query.filter_by(user_id=user_id).all()
+
+        return redirect(f"/user/{g.user.id}")
     
     else: 
 
         return render_template("boardgames/add_game.html", form = form)
+    

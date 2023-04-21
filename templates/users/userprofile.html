@@ -13,5 +13,24 @@
     
     <b><p>HERE ARE YOUR GAMELIST:</p></b>
     
-  
+
+    <!-- group all game name into 1 gamelist -->
+
+    {% for title, games in gamelists|groupby('gamelist_title') %}
+        <ul>
+            <b>{{title}}</b>
+            
+            {% for game in games %}
+                <i>
+                    <li>
+                        {{game.name}}
+                       <a href="/gamelist/{{game.id}}/edit">Edit</a> |
+                       <a href="">Check My Review</a>
+
+                    </li>
+                </i>
+            {% endfor %}
+        </ul>
+    {% endfor %}
+
 {% endblock %}
