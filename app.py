@@ -258,3 +258,8 @@ def add_user_games(user_id):
     else: 
 
         return render_template("boardgames/add_game.html", form = form)
+
+
+
+#THIS IS THE MAIN BRANCH
+
