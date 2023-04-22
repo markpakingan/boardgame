@@ -46,7 +46,6 @@
           <img src="{{ g.user.image_url }}" alt="{{ g.user.username }}">
         </a>
       </li>
-      <li><a href="/profile">Profile</a></li>
       <li><a href="/logout">Log out</a></li>
       {% endif %}
 
@@ -61,13 +60,6 @@
   <div class="alert alert-{{ category }}">{{ message }}</div>
   {% endfor %}
 
-  <!-- Added this for testing -->
-
-  <div>
-    {% for msg in get_flashed_messages() %}
-    <div>{{ msg }}</div>
-    {% endfor %}
-  </div>
 
   {% block content %}
   {% endblock %}

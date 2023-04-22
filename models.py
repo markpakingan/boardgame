@@ -17,14 +17,14 @@ class Game(db.Model):
     id = db.Column(db.Integer, primary_key = True, autoincrement = True)
     game_sku_id = db.Column (db.Text, nullable = True)
     name = db.Column(db.Text, nullable = False )
-    description = db.Column(db.Text, nullable = False )
-    lowest_price = db.Column(db.Float, nullable = False )
-    MSRP = db.Column(db.Float, nullable = False )
-    image_url = db.Column(db.Text, nullable = False )
-    min_play = db.Column(db.Integer, nullable = False )
-    max_play = db.Column(db.Integer, nullable = False )
-    mechanics = db.Column(db.Text, nullable = False )
-    artists= db.Column(db.Text, nullable = False )
+    description = db.Column(db.Text, nullable = True )
+    lowest_price = db.Column(db.Float, nullable = True )
+    MSRP = db.Column(db.Float, nullable = True )
+    image_url = db.Column(db.Text, nullable = True )
+    min_play = db.Column(db.Integer, nullable = True )
+    max_play = db.Column(db.Integer, nullable = True )
+    mechanics = db.Column(db.Text, nullable = True )
+    artists= db.Column(db.Text, nullable = True )
 
     # gamelists = db.relationship("GameList", secondary = "game_gamelists", backref = "games")
 
@@ -33,9 +33,10 @@ class GameList(db.Model):
     __tablename__ = "gamelists"
 
     id = db.Column (db.Integer, primary_key = True, autoincrement = True)
+    title = db.Column (db.Text, nullable = False) 
     name = db.Column (db.Text, nullable = False)
     description = db.Column (db.Text, nullable = False)
-    user_id = db.Column (db.Text, db.ForeignKey("users.id"),nullable = False)
+    user_id = db.Column (db.Integer, db.ForeignKey("users.id"),nullable = False)
 
 
 class Game_Gamelist (db.Model):

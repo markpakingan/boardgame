@@ -7,7 +7,7 @@ from sqlalchemy.exc import IntegrityError
 
 
 
-from forms import UserAddForm, LoginForm, GameListForm
+from forms import UserAddForm, LoginForm, GameListForm, DeleteForm
 from models import db, connect_db, Game, User, Image, Video, Review, Game_Gamelist, GameList
 
 
@@ -132,7 +132,7 @@ def logout():
 @app.route('/')
 def homepage():
     
-    # """if user is verified, show their dashboard, if not, let them sign-up"""
+    """if user is verified, show their dashboard, if not, let them sign-up"""
 
     if g.user: 
         # print("g.user is not None:", g.user)
@@ -146,7 +146,7 @@ def homepage():
 # API FUNCTIONS
 
 def get_names(name):
-    """get boardgame names based on searchquery"""
+    """get 4 boardgame names based on searchquery"""
 
     res = requests.get(f"{API_BASE_URL}/search", 
                        params = {'name': name, 'client_id': client_id })
@@ -175,21 +175,11 @@ def get_names(name):
                         }
     return name_and_id
 
-##############################################################################
-# BOARD GAME ROUTE
 
+def get_gameinfo(game_official_id):
 
-@app.route('/boardgamelist')
-def get_boardgamelist():
-    name = request.args["name"]
-    
-    name_and_id = get_names(name)
-    return render_template("home.html", name_and_id = name_and_id)
+    """gets all the game information form the API"""
 
-    # import pdb; pdb.set_trace()
-
-@app.route('/boardgamelist/<game_official_id>')
-def get_selected_boardgame(game_official_id):
 
     res = requests.get(f"{API_BASE_URL}/search", 
                        params = {'ids': game_official_id, 'client_id': client_id })
@@ -214,6 +204,28 @@ def get_selected_boardgame(game_official_id):
                     "mechanics": mechanics, 
                     # "artist": artist
                     }
+    
+    return game_details
+##############################################################################
+# BOARD GAME ROUTE
+
+
+@app.route('/boardgamelist')
+def get_boardgamelist():
+    """Show 4 boardgame names"""
+
+    name = request.args["name"]
+    
+    name_and_id = get_names(name)
+    return render_template("home.html", name_and_id = name_and_id)
+
+    # import pdb; pdb.set_trace()
+
+@app.route('/boardgamelist/<game_official_id>')
+def get_selected_boardgame(game_official_id):
+    """show details for a chosen boardgame"""
+
+    game_details = get_gameinfo(game_official_id)
 
     return render_template ('boardgames/game_description.html',
                            game_details = game_details
@@ -222,6 +234,7 @@ def get_selected_boardgame(game_official_id):
 
 @app.route('/gamelist/<int:gamelist_id>/edit', methods=['GET', 'POST'])
 def edit_gamelist(gamelist_id):
+    """Edits a single boardgame"""
 
     gamelist = GameList.query.get_or_404(gamelist_id)
     form = GameListForm(obj=gamelist)
@@ -239,7 +252,7 @@ def edit_gamelist(gamelist_id):
 
 @app.route('/gamelist/<int:gamelist_id>/delete', methods=['POST'])
 def delete_gamelist(gamelist_id):
-    """Deletes a single game"""
+    """Deletes a single boardgame"""
 
     if not g.user:
         flash ("You are not authorized to view this!", "danger")
@@ -257,9 +270,11 @@ def delete_gamelist(gamelist_id):
     return redirect(f"/user/{g.user.id}")
 
 ##############################################################################
+# REVIEW ROUTE
 
 @app.route('/gamelist/<int:gamelist_id>/review')
 def show_review(gamelist_id):
+    """Shows the review of a game"""
 
     gamelist = GameList.query.get_or_404(gamelist_id)
 
@@ -294,10 +309,12 @@ def add_user_games(user_id):
     form = GameListForm()
 
     if form.validate_on_submit():
+        title = form.title.data
         name = form.name.data
         description = form.description.data
 
-        game = Game(name = name, description = description)
+        game = GameList(name = name, description = description,
+                        title = title, user_id = user_id)
 
         db.session.add(game)
         db.session.commit()

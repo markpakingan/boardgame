@@ -21,5 +21,9 @@ class LoginForm(FlaskForm):
 
 class GameListForm(FlaskForm):
 
+    title = StringField("GameList Title",validators=[DataRequired()])
     name = StringField("Name",validators=[DataRequired()])
     description = StringField("Description",validators=[DataRequired()])
+
+class DeleteForm(FlaskForm):
+    """Delete form -- this form is intentionally blank."""
