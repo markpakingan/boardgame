@@ -16,7 +16,7 @@
 
     <!-- group all game name into 1 gamelist -->
 
-    {% for title, games in gamelists|groupby('gamelist_title') %}
+    {% for title, games in gamelists|groupby('title') %}
         <ul>
             <b>{{title}}</b>
             
@@ -25,7 +25,7 @@
                     <li>
                         {{game.name}}
                        <a href="/gamelist/{{game.id}}/edit">Edit</a> |
-                       <a href="">Check My Review</a>
+                       <a href="/gamelist/{{game.id}}/review">Check My Review</a>
 
                     </li>
                 </i>

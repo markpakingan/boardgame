@@ -6,7 +6,8 @@
 
   <form method="POST">
     {{ form.hidden_tag() }}
-    {{form.gamelist_title.label}} {{form.gamelist_title}} 
+
+    {{form.title.label}} {{form.title()}} 
     {{ form.name.label }} {{ form.name() }}
     {{ form.description.label }} {{ form.description() }}
     <button type="submit">Save Changes</button>

@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, TextAreaField
+from wtforms import StringField, PasswordField, TextAreaField, IntegerField, SelectField
 from wtforms.validators import DataRequired, Email, Length
 
 class UserAddForm(FlaskForm):
@@ -25,5 +25,13 @@ class GameListForm(FlaskForm):
     name = StringField("Name",validators=[DataRequired()])
     description = StringField("Description",validators=[DataRequired()])
 
+
+class ReviewForm(FlaskForm):
+    rating = SelectField("Rating", choices =[("1", "1"), ("2", "2"),
+                                            ("3", "3"),("4", "4"),
+                                            ("5", "5")] , 
+                                            validators=[DataRequired()])
+    feedback = StringField("Feedback", validators=[DataRequired()])
+    
 class DeleteForm(FlaskForm):
     """Delete form -- this form is intentionally blank."""

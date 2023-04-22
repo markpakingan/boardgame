@@ -7,7 +7,7 @@ from sqlalchemy.exc import IntegrityError
 
 
 
-from forms import UserAddForm, LoginForm, GameListForm, DeleteForm
+from forms import UserAddForm, LoginForm, GameListForm, DeleteForm, ReviewForm
 from models import db, connect_db, Game, User, Image, Video, Review, Game_Gamelist, GameList
 
 
@@ -206,87 +206,13 @@ def get_gameinfo(game_official_id):
                     }
     
     return game_details
-##############################################################################
-# BOARD GAME ROUTE
 
-
-@app.route('/boardgamelist')
-def get_boardgamelist():
-    """Show 4 boardgame names"""
-
-    name = request.args["name"]
-    
-    name_and_id = get_names(name)
-    return render_template("home.html", name_and_id = name_and_id)
-
-    # import pdb; pdb.set_trace()
-
-@app.route('/boardgamelist/<game_official_id>')
-def get_selected_boardgame(game_official_id):
-    """show details for a chosen boardgame"""
-
-    game_details = get_gameinfo(game_official_id)
-
-    return render_template ('boardgames/game_description.html',
-                           game_details = game_details
-                           )
-
-
-@app.route('/gamelist/<int:gamelist_id>/edit', methods=['GET', 'POST'])
-def edit_gamelist(gamelist_id):
-    """Edits a single boardgame"""
-
-    gamelist = GameList.query.get_or_404(gamelist_id)
-    form = GameListForm(obj=gamelist)
-
-    if form.validate_on_submit():
-        form.populate_obj(gamelist)
-        db.session.commit()
-        flash('Gamelist updated!', 'success')
-        return redirect(f"/user/{g.user.id}")
-
-    return render_template('boardgames/edit.html', form=form, 
-                           gamelist=gamelist)
-
-
-
-@app.route('/gamelist/<int:gamelist_id>/delete', methods=['POST'])
-def delete_gamelist(gamelist_id):
-    """Deletes a single boardgame"""
-
-    if not g.user:
-        flash ("You are not authorized to view this!", "danger")
-        return redirect("/")
-    
-
-    gamelist = GameList.query.get_or_404(gamelist_id)
-    
-    form = DeleteForm()
-
-    if form.validate_on_submit():
-        db.session.delete(gamelist)
-        db.session.commit()
-
-    return redirect(f"/user/{g.user.id}")
-
-##############################################################################
-# REVIEW ROUTE
-
-@app.route('/gamelist/<int:gamelist_id>/review')
-def show_review(gamelist_id):
-    """Shows the review of a game"""
-
-    gamelist = GameList.query.get_or_404(gamelist_id)
-
-    return render_template("review/show_review.html", gamelist = gamelist)
 
 
 ##############################################################################
-
 # USER PROFILE ROUTE
 
-
-@app.route('/user/<int:user_id>')
+@app.route('/user/<int:user_id>/gamelist')
 def check_user_profile(user_id):
     """Show user profile"""
     if not g.user:
@@ -328,3 +254,103 @@ def add_user_games(user_id):
 
         return render_template("boardgames/add_game.html", form = form)
     
+##############################################################################
+# BOARD GAME ROUTE
+
+@app.route('/boardgamelist')
+def get_boardgamelist():
+    """Show 4 boardgame names"""
+
+    name = request.args["name"]
+    
+    name_and_id = get_names(name)
+    return render_template("home.html", name_and_id = name_and_id)
+
+    # import pdb; pdb.set_trace()
+
+@app.route('/boardgamelist/<game_official_id>')
+def get_selected_boardgame(game_official_id):
+    """show details for a chosen boardgame"""
+
+    game_details = get_gameinfo(game_official_id)
+
+    return render_template ('boardgames/game_description.html',
+                           game_details = game_details
+                           )
+
+
+@app.route('/gamelist/<int:gamelist_id>/edit', methods=['GET', 'POST'])
+def edit_gamelist(gamelist_id):
+    """Edits a single boardgame"""
+
+    gamelist = GameList.query.get_or_404(gamelist_id)
+    form = GameListForm(obj=gamelist)
+
+    if form.validate_on_submit():
+        form.populate_obj(gamelist)
+        db.session.commit()
+        flash('Gamelist updated!', 'success')
+        return redirect(f"/user/{g.user.id}/gamelist")
+
+    return render_template('boardgames/edit.html', form=form, 
+                           gamelist=gamelist)
+
+
+
+@app.route('/gamelist/<int:gamelist_id>/delete', methods=['POST'])
+def delete_gamelist(gamelist_id):
+    """Deletes a single boardgame"""
+
+    if not g.user:
+        flash ("You are not authorized to view this!", "danger")
+        return redirect("/")
+    
+
+    gamelist = GameList.query.get_or_404(gamelist_id)
+    
+    form = DeleteForm()
+
+    if form.validate_on_submit():
+        db.session.delete(gamelist)
+        db.session.commit()
+
+    return redirect(f"/user/{g.user.id}")
+
+##############################################################################
+# REVIEW ROUTE
+
+@app.route('/gamelist/<int:gamelist_id>/review')
+def show_review(gamelist_id):
+    """Shows the review of a game"""
+
+    gamelist = GameList.query.get_or_404(gamelist_id)
+
+    return render_template("review/show_review.html", gamelist = gamelist)
+
+
+@app.route('/gamelist/<int:gamelist_id>/review/add', methods = ["GET", "POSTS"])
+def add_singlegame_review(gamelist_id):
+    """adds a review to a single game"""
+
+    form = ReviewForm()
+
+    gamelist = GameList.query.get_or_404(gamelist_id)
+
+    if form.validate_on_submit():
+        rating = form.rating.data
+        feedback = form.feedback.data
+
+        review = Review(rating=rating, feedback=feedback,
+                        user_id = g.user.id, game_id=gamelist_id)
+
+        db.session.add(review)
+        db.session.commit()
+        flash("You added a review!")
+        return redirect(f'gamelist/{gamelist_id}/review')
+
+    else:
+
+        return render_template("review/add_review.html", form = form, 
+                               gamelist=gamelist)
+    
+##############################################################################
