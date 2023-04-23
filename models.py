@@ -75,7 +75,7 @@ class Review(db.Model):
 
     id = db.Column(db.Integer, primary_key = True, autoincrement = True)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable = False )
-    game_id = db.Column(db.Integer, db.ForeignKey("games.id"), nullable = False )
+    gamelist_id = db.Column(db.Integer, db.ForeignKey("gamelists.id"), nullable = False )
     rating = db.Column (db.Integer, nullable = False)
     feedback = db.Column (db.Text, nullable = False)
 

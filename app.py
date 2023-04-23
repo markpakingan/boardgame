@@ -248,7 +248,7 @@ def add_user_games(user_id):
         # for testing
         gamelists = GameList.query.filter_by(user_id=user_id).all()
 
-        return redirect(f"/user/{g.user.id}")
+        return redirect(f"/user/{g.user.id}/gamelist")
     
     else: 
 
@@ -314,7 +314,7 @@ def delete_gamelist(gamelist_id):
         db.session.delete(gamelist)
         db.session.commit()
 
-    return redirect(f"/user/{g.user.id}")
+    return redirect(f"/user/{g.user.id}/gamelist")
 
 ##############################################################################
 # REVIEW ROUTE
@@ -324,11 +324,11 @@ def show_review(gamelist_id):
     """Shows the review of a game"""
 
     gamelist = GameList.query.get_or_404(gamelist_id)
+    review = Review.query.get_or_404(gamelist_id)
+    return render_template("review/show_review.html", gamelist = gamelist, review=review)
 
-    return render_template("review/show_review.html", gamelist = gamelist)
 
-
-@app.route('/gamelist/<int:gamelist_id>/review/add', methods = ["GET", "POSTS"])
+@app.route('/gamelist/<int:gamelist_id>/review/add', methods = ["GET", "POST"])
 def add_singlegame_review(gamelist_id):
     """adds a review to a single game"""
 
@@ -341,16 +341,33 @@ def add_singlegame_review(gamelist_id):
         feedback = form.feedback.data
 
         review = Review(rating=rating, feedback=feedback,
-                        user_id = g.user.id, game_id=gamelist_id)
+                        user_id = g.user.id, gamelist_id=gamelist_id)
 
         db.session.add(review)
         db.session.commit()
         flash("You added a review!")
-        return redirect(f'gamelist/{gamelist_id}/review')
+        return redirect(f"/gamelist/{gamelist_id}/review")
 
     else:
 
         return render_template("review/add_review.html", form = form, 
                                gamelist=gamelist)
-    
+
+
+@app.route('/gamelist/<int:gamelist_id>/review/edit', methods=['GET', 'POST'])
+def edit_reviewlist(gamelist_id):
+    """Edits the review of a single boardgame"""
+
+    review = Review.query.get_or_404(gamelist_id)
+    form = ReviewForm(obj=review)
+
+    if form.validate_on_submit():
+        form.populate_obj(review)
+        db.session.commit()
+        flash('Your review has been updated!', 'success')
+        return redirect(f"/user/{gamelist_id}/review")
+
+    return render_template('review/edit_review.html', form=form, 
+                           review=review)
+
 ##############################################################################

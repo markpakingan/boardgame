@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+
+{% block content %}
+
+
+<h1>Edit Your Review</h1>
+
+
+<form method="POST">
+  {{ form.hidden_tag() }}
+
+  {{ form.rating.label }} {{ form.rating() }}
+  {{ form.feedback.label }} {{ form.feedback() }}
+  <button type="submit">Save Changes</button>
+</form>
+
+{% endblock %}

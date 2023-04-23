@@ -10,20 +10,22 @@
 <p>Rate this Game from 1-5 <p>
 <p><i>(5 is the highest!)</i></p>
 
-{{ form.hidden_tag() }} 
-    
-    {% for field in form if field.widget.input_type !=
-    'hidden' %}
-    <p>
-        {{ field.label }} {{ field }} 
-        {% for error in field.errors %} 
-        {{ error}} 
-        
-        {% endfor %}
-    </p>
-    {% endfor %}
+<form method="POST">
 
-    <button type="submit">Add Review</button>
+    {{ form.hidden_tag() }} 
+        
+        {% for field in form if field.widget.input_type !=
+        'hidden' %}
+        <p>
+            {{ field.label }} {{ field }} 
+            {% for error in field.errors %} 
+            {{ error}} 
+            
+            {% endfor %}
+        </p>
+        {% endfor %}
+
+        <button type="submit">Add Review</button>
 </form>
 
 
