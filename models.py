@@ -89,6 +89,10 @@ class User(db.Model):
     image_url = db.Column (db.Text, nullable = True)
     email = db.Column(db.Text, nullable = False)
 
+    def __repr__(self):
+        return f"<User {self.username}>"
+    
+    
     @classmethod
     def signup(cls, username, email, password, image_url):
         """Sign up user.

@@ -37,7 +37,7 @@ connect_db(app)
 db.create_all()
 
 ##############################################################################
-# User signup/login/logout
+# USER SIGNUP, LOGIN, LOGOUT
 
 
 @app.before_request
@@ -177,7 +177,6 @@ def get_names(name):
 
 
 def get_gameinfo(game_official_id):
-
     """gets all the game information form the API"""
 
 
@@ -266,7 +265,6 @@ def get_boardgamelist():
     name_and_id = get_names(name)
     return render_template("home.html", name_and_id = name_and_id)
 
-    # import pdb; pdb.set_trace()
 
 @app.route('/boardgamelist/<game_official_id>')
 def get_selected_boardgame(game_official_id):
@@ -323,9 +321,12 @@ def delete_gamelist(gamelist_id):
 def show_review(gamelist_id):
     """Shows the review of a game"""
 
+    username = g.user.username
     gamelist = GameList.query.get_or_404(gamelist_id)
-    review = Review.query.get_or_404(gamelist_id)
-    return render_template("review/show_review.html", gamelist = gamelist, review=review)
+    review = Review.query.filter_by(gamelist_id=gamelist_id).first()
+
+    return render_template("review/show_review.html", gamelist=gamelist, 
+                           review=review, username=username)
 
 
 @app.route('/gamelist/<int:gamelist_id>/review/add', methods = ["GET", "POST"])
@@ -334,7 +335,16 @@ def add_singlegame_review(gamelist_id):
 
     form = ReviewForm()
 
+
     gamelist = GameList.query.get_or_404(gamelist_id)
+    review = Review.query.filter_by(gamelist_id=gamelist_id,
+                                    user_id=g.user.id).first()
+    
+        # check if review is already existing
+    if review:
+        flash("You already added a review for this game!", "danger")
+        return redirect(f"/gamelist/{gamelist_id}/review")
+
 
     if form.validate_on_submit():
         rating = form.rating.data
@@ -342,11 +352,11 @@ def add_singlegame_review(gamelist_id):
 
         review = Review(rating=rating, feedback=feedback,
                         user_id = g.user.id, gamelist_id=gamelist_id)
-
+        
         db.session.add(review)
         db.session.commit()
         flash("You added a review!")
-        return redirect(f"/gamelist/{gamelist_id}/review")
+        return redirect("/")
 
     else:
 
@@ -358,16 +368,37 @@ def add_singlegame_review(gamelist_id):
 def edit_reviewlist(gamelist_id):
     """Edits the review of a single boardgame"""
 
-    review = Review.query.get_or_404(gamelist_id)
+    review = Review.query.filter_by(gamelist_id=gamelist_id).first()
+    gamelist = GameList.query.get_or_404(gamelist_id)
     form = ReviewForm(obj=review)
 
     if form.validate_on_submit():
         form.populate_obj(review)
         db.session.commit()
         flash('Your review has been updated!', 'success')
-        return redirect(f"/user/{gamelist_id}/review")
+        return redirect(f"/gamelist/{gamelist_id}/review")
 
     return render_template('review/edit_review.html', form=form, 
-                           review=review)
+                           review=review, gamelist=gamelist)
 
+
+
+@app.route('/gamelist/<int:gamelist_id>/review/delete', methods=['POST'])
+def delete_review(gamelist_id):
+    """Deletes the review of a boardgame"""
+
+    if not g.user:
+        flash ("You are not authorized to view this!", "danger")
+        return redirect("/")
+    
+
+    review = Review.query.filter_by(gamelist_id=gamelist_id).first()
+    
+    form = DeleteForm()
+
+    if form.validate_on_submit():
+        db.session.delete(review)
+        db.session.commit()
+
+    return redirect(f"/gamelist/{gamelist_id}/review")
 ##############################################################################

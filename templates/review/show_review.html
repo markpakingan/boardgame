@@ -3,15 +3,15 @@
 
 {% block content %}
 
-"Show the review here"
 
-<h1>Game Name: Link Game List Title</h1>
+<h1>{{gamelist.name}} Review</h1>
+<p>By: {{username}}</p>
 <h2>Rating: {{review.rating}}</h2>
 
-<h2>Rating: {{review.feedback}}</h2>
+<h2>Feedback: {{review.feedback}}</h2>
 
-
-<a href="/gamelist/{{gamelist.id}}/review/add"><p>Click Here To Add Review</p></a>
+<a href="/gamelist/{{gamelist.id}}/review/edit"><p>Edit Review</p></a>
+<a href="/gamelist/{{gamelist.id}}/review/add"><p>Add Review</p></a>
 
 
 {% endblock %}
