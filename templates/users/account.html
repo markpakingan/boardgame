@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+
+<h1>Hi {{user.username}}</h1>
+<hr>
+
+<h3>Here's your current info:</h3>
+
+<br>
+
+    <ul>
+        <li><b>Name:</b> {{user.username}}</li>
+        <li><b>Email:</b> {{user.email}}</li>
+        <a href="/account/user/{{user.id}}/edit">Edit</a>
+    </ul>
+
+
+{% endblock%}

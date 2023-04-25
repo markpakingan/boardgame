@@ -128,6 +128,7 @@ def logout():
     return redirect ("/")
 
 ##############################################################################
+# HOMEPAGE
 
 @app.route('/')
 def homepage():
@@ -141,6 +142,83 @@ def homepage():
     else:
 
         return render_template ("home-anon.html")
+    
+##############################################################################
+# USER PROFILE ROUTE
+
+@app.route('/account/user/<int:user_id>')
+def show_user_account(user_id):
+    """shows the user's account information"""
+
+    if not g.user:
+       flash ("You are not authorized to view this!", "danger")
+       return redirect("/")
+    
+    user = User.query.get_or_404(user_id)
+
+    return render_template("users/account.html", user=user)
+
+@app.route('/account/user/<int:user_id>/edit', methods = ["GET", "POST"])
+def edit_user_account(user_id):
+    """Edits the user's account information"""
+
+    user = User.query.get_or_404(user_id)
+    form = UserAddForm(obj=user)
+
+    if form.validate_on_submit():
+        form.populate_obj(user)
+        db.session.commit()
+        flash('User account updated!', 'success')
+        return redirect("/")
+
+    return render_template('users/edit_user.html', form=form, 
+                           user=user)
+
+
+
+@app.route('/user/<int:user_id>/gamelist')
+def check_user_profile(user_id):
+    """Show user profile"""
+
+    if not g.user:
+       flash ("You are not authorized to view this!", "danger")
+       return redirect("/")
+       
+    user = User.query.get_or_404(user_id)
+    gamelists = GameList.query.filter_by(user_id = user_id).all()
+
+ 
+    return render_template("users/userprofile.html", user = user,
+                            gamelists = gamelists)
+
+
+@app.route('/user/<int:user_id>/add-game', methods = ["GET", "POST"])
+def add_user_games(user_id):
+    """adds gameslist to user's profile"""
+
+    
+    form = GameListForm()
+
+    if form.validate_on_submit():
+        title = form.title.data
+        name = form.name.data
+        description = form.description.data
+
+        game = GameList(name = name, description = description,
+                        title = title, user_id = user_id)
+
+        db.session.add(game)
+        db.session.commit()
+
+        # for testing
+        gamelists = GameList.query.filter_by(user_id=user_id).all()
+
+        return redirect(f"/user/{g.user.id}/gamelist")
+    
+    else: 
+
+        return render_template("boardgames/add_game.html", form = form)
+
 
 ##############################################################################
 # API FUNCTIONS
@@ -194,65 +272,60 @@ def get_gameinfo(game_official_id):
     min_players =data["games"][0]["min_players"]
     max_players =data["games"][0]["max_players"]
     mechanics = data["games"][0].get("mechanics",None)
-    # artist = data["games"][0]["artists"][0]
-
+    thumb_url = data["games"][0]["thumb_url"]
 
     game_details = {"name": name, "description": description, "lowest_price": lowest_price, 
                     "year_published": year_published, "MSRP": MSRP, "min_players": min_players,
                     "max_players": max_players,
                     "mechanics": mechanics, 
-                    # "artist": artist
+                    "thumb_url": thumb_url
                     }
     
     return game_details
 
 
+def get_videos_api(game_official_id):
+    """Get videos of a single game"""
 
-##############################################################################
-# USER PROFILE ROUTE
-
-@app.route('/user/<int:user_id>/gamelist')
-def check_user_profile(user_id):
-    """Show user profile"""
-    if not g.user:
-       flash ("You are not authorized to view this!", "danger")
-       return redirect("/")
-       
-    user = User.query.get_or_404(user_id)
-    gamelists = GameList.query.filter_by(user_id = user_id).all()
-
- 
-    return render_template("users/userprofile.html", user = user,
-                            gamelists = gamelists)
-
-
-@app.route('/user/<int:user_id>/add-game', methods = ["GET", "POST"])
-def add_user_games(user_id):
-    """adds gameslist to user's profile"""
-
+    res = requests.get(f"{API_BASE_URL}/videos", 
+                       params = {'limit': 20, 'client_id': client_id, 
+                                 'game_id':game_official_id})
     
-    form = GameListForm()
+    data = res.json()
+    print(data)
 
-    if form.validate_on_submit():
-        title = form.title.data
-        name = form.name.data
-        description = form.description.data
+    video = data["videos"][0]["url"]
+    video1 = data["videos"][1]["url"]
+    video2 = data["videos"][2]["url"]
 
-        game = GameList(name = name, description = description,
-                        title = title, user_id = user_id)
+    video_list = {"video": video, "video1":video1, "video2": video2}
 
-        db.session.add(game)
-        db.session.commit()
+    return video_list
 
-        # for testing
-        gamelists = GameList.query.filter_by(user_id=user_id).all()
 
-        return redirect(f"/user/{g.user.id}/gamelist")
+# def get_api_reviews(game_official_id):
+#     """Get reviews for API for a single game"""
+
+#     res = requests.get(f"{API_BASE_URL}/reviews", 
+#                        params={'client_id': client_id, 'game_id': game_official_id,
+#                                'description_required': True})
+
+#     data = res.json()
+
+#     rating = data.reviews[0].rating
+#     feedback = data.reviews[0].description
+#     rating1 = data.reviews[1].rating
+#     feedback1 = data.reviews[1].description
+#     rating2 = data.reviews[2].rating
+#     feedback2 = data.reviews[2].description
+
+#     game_reviews = {"rating": rating, "feedback": feedback,
+#                     "rating1": rating1, "feedback1": feedback1,
+#                     "rating2": rating2, "feedback2": feedback2,
+#                     }
     
-    else: 
+#     return game_reviews
 
-        return render_template("boardgames/add_game.html", form = form)
-    
 ##############################################################################
 # BOARD GAME ROUTE
 
@@ -271,9 +344,11 @@ def get_selected_boardgame(game_official_id):
     """show details for a chosen boardgame"""
 
     game_details = get_gameinfo(game_official_id)
+    # video_list = get_videos_api(game_official_id)
 
     return render_template ('boardgames/game_description.html',
-                           game_details = game_details
+                           game_details = game_details, 
+                        #    video_list = video_list
                            )
 
 
@@ -313,6 +388,7 @@ def delete_gamelist(gamelist_id):
         db.session.commit()
 
     return redirect(f"/user/{g.user.id}/gamelist")
+
 
 ##############################################################################
 # REVIEW ROUTE

@@ -4,20 +4,31 @@
 
 
 
-<h1>Learn More About {{game_details["name"]}} </h1>
+<h1>About {{game_details["name"]}} </h1>
         
         {% if game_details %}
         <ul>
-                <li><b>Description: </b> {{game_details["description"]}}</li>
+                </b><img src='{{game_details["thumb_url"]}}'></li>
+                <li><b>Description: 
+                        <br>
+                        </b> {{game_details["description"]|safe}}</li>
                 <li><b> No. of Players: </b>{{game_details["min_players"]}} - {{game_details["max_players"]}} </li>
                 <li><b> Lowest Price: </b>{{game_details["lowest_price"]}}</li>
                 <li><b> Year Published: </b>{{game_details["year_published"]}}</li>
                 <li><b> MSRP: </b>{{game_details["msrp"]}}</li>
                 <li><b> Mechanics: </b>{{game_details["mechanics"]}}</li>
-                <!-- <li><b> Artist: </b>{{game_details["artist"]}}</li> -->
-
         </ul>
 
-        {% endif %}
+        <!-- {% endif %}
+
+
+        {% if video_list %}
+
+        {{video_list["video"]}}
+        {{video_list["video1"]}}
+        {{video_list["video2"]}}
+
+        {% endif %} -->
+
 
 {% endblock %}
