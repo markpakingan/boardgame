@@ -9,6 +9,11 @@
         {% if game_details %}
         <ul>
                 </b><img src='{{game_details["thumb_url"]}}'></li>
+                
+                <br>
+                <a href="/user/{{g.user.id}}/add-game">Add To Gamelist</a>
+                <br>
+
                 <li><b>Description: 
                         <br>
                         </b> {{game_details["description"]|safe}}</li>

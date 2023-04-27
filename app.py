@@ -73,6 +73,9 @@ def signup():
     If the there already is a user with that username: flash message
     and re-present form.
     """
+    if CURR_USER_KEY in session:
+        del session[CURR_USER_KEY]
+
 
     form = UserAddForm()
 
@@ -123,7 +126,7 @@ def login():
 def logout():
     """Handle logout of user."""
 
-    flash ("You have been logout!")
+    flash ("You have been logout!", "danger")
     do_logout()
     return redirect ("/")
 
@@ -150,11 +153,13 @@ def homepage():
 def show_user_account(user_id):
     """shows the user's account information"""
 
-    if not g.user:
+    user = User.query.get_or_404(user_id)
+
+    if g.user.id != user_id:
        flash ("You are not authorized to view this!", "danger")
        return redirect("/")
     
-    user = User.query.get_or_404(user_id)
+    
 
     return render_template("users/account.html", user=user)
 
@@ -164,6 +169,11 @@ def edit_user_account(user_id):
 
     user = User.query.get_or_404(user_id)
     form = UserAddForm(obj=user)
+
+    if g.user.id != user_id:
+        flash ("You are not authorized to view this!", "danger")
+        return redirect("/")
+    
 
     if form.validate_on_submit():
         form.populate_obj(user)
@@ -180,9 +190,10 @@ def edit_user_account(user_id):
 def check_user_profile(user_id):
     """Show user profile"""
 
-    if not g.user:
-       flash ("You are not authorized to view this!", "danger")
-       return redirect("/")
+    
+    if g.user.id != user_id:
+        flash("You are not authorized to view this!", "danger")
+        return redirect("/")    
        
     user = User.query.get_or_404(user_id)
     gamelists = GameList.query.filter_by(user_id = user_id).all()
@@ -196,7 +207,11 @@ def check_user_profile(user_id):
 def add_user_games(user_id):
     """adds gameslist to user's profile"""
 
+    if g.user.id != user_id:
+        flash("You are not authorized to view this!", "danger")
+        return redirect("/")   
     
+
     form = GameListForm()
 
     if form.validate_on_submit():
@@ -344,11 +359,9 @@ def get_selected_boardgame(game_official_id):
     """show details for a chosen boardgame"""
 
     game_details = get_gameinfo(game_official_id)
-    # video_list = get_videos_api(game_official_id)
 
     return render_template ('boardgames/game_description.html',
                            game_details = game_details, 
-                        #    video_list = video_list
                            )
 
 
@@ -357,7 +370,15 @@ def edit_gamelist(gamelist_id):
     """Edits a single boardgame"""
 
     gamelist = GameList.query.get_or_404(gamelist_id)
+    user_id = gamelist.user_id
+
+    if g.user.id != user_id:
+        flash("You are not authorized to view this!", "danger")
+        return redirect("/")   
+    
+    
     form = GameListForm(obj=gamelist)
+
 
     if form.validate_on_submit():
         form.populate_obj(gamelist)
@@ -374,12 +395,13 @@ def edit_gamelist(gamelist_id):
 def delete_gamelist(gamelist_id):
     """Deletes a single boardgame"""
 
-    if not g.user:
-        flash ("You are not authorized to view this!", "danger")
-        return redirect("/")
     
-
     gamelist = GameList.query.get_or_404(gamelist_id)
+    user_id = gamelist.user_id
+
+    if g.user.id != user_id:
+        flash("You are not authorized to view this!", "danger")
+        return redirect("/")   
     
     form = DeleteForm()
 
@@ -400,7 +422,7 @@ def show_review(gamelist_id):
     username = g.user.username
     gamelist = GameList.query.get_or_404(gamelist_id)
     review = Review.query.filter_by(gamelist_id=gamelist_id).first()
-
+  
     return render_template("review/show_review.html", gamelist=gamelist, 
                            review=review, username=username)
 
@@ -416,7 +438,7 @@ def add_singlegame_review(gamelist_id):
     review = Review.query.filter_by(gamelist_id=gamelist_id,
                                     user_id=g.user.id).first()
     
-        # check if review is already existing
+    # check if review is already existing
     if review:
         flash("You already added a review for this game!", "danger")
         return redirect(f"/gamelist/{gamelist_id}/review")
