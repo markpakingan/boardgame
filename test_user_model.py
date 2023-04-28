@@ -40,14 +40,6 @@ class UserModelTestCase(TestCase):
         return res
     
 
-
-# class APITestCase(TestCase):
-    
-#     def test_get_request(self):
-#         """check if api is pulling"""
-#         response = requests.get("https://api.boardgameatlas.com/api/search?name=Catan&pretty=true&client_id=Ctqu3FqFnC")
-        
-#         self.assertEqual(response.status_code, 200)
         
     
 
@@ -95,3 +87,7 @@ class UserModelTestCase(TestCase):
         db.session.commit()
 
         self.assertIn(user, db.session)
+
+
+
+    

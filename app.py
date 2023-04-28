@@ -298,49 +298,6 @@ def get_gameinfo(game_official_id):
     
     return game_details
 
-
-def get_videos_api(game_official_id):
-    """Get videos of a single game"""
-
-    res = requests.get(f"{API_BASE_URL}/videos", 
-                       params = {'limit': 20, 'client_id': client_id, 
-                                 'game_id':game_official_id})
-    
-    data = res.json()
-    print(data)
-
-    video = data["videos"][0]["url"]
-    video1 = data["videos"][1]["url"]
-    video2 = data["videos"][2]["url"]
-
-    video_list = {"video": video, "video1":video1, "video2": video2}
-
-    return video_list
-
-
-# def get_api_reviews(game_official_id):
-#     """Get reviews for API for a single game"""
-
-#     res = requests.get(f"{API_BASE_URL}/reviews", 
-#                        params={'client_id': client_id, 'game_id': game_official_id,
-#                                'description_required': True})
-
-#     data = res.json()
-
-#     rating = data.reviews[0].rating
-#     feedback = data.reviews[0].description
-#     rating1 = data.reviews[1].rating
-#     feedback1 = data.reviews[1].description
-#     rating2 = data.reviews[2].rating
-#     feedback2 = data.reviews[2].description
-
-#     game_reviews = {"rating": rating, "feedback": feedback,
-#                     "rating1": rating1, "feedback1": feedback1,
-#                     "rating2": rating2, "feedback2": feedback2,
-#                     }
-    
-#     return game_reviews
-
 ##############################################################################
 # BOARD GAME ROUTE
 
