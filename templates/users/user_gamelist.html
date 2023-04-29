@@ -9,12 +9,19 @@
     
     <br>
     <p><i>Ready to Create Your Own GameList? 
-        <a href="/user/{{user.id}}/add-game">Click Here</a></i></p>
+        <a href="/user/{{user.id}}/gamelist/add">Click Here</a></i></p>
     
     <b><p>HERE ARE YOUR GAMELIST:</p></b>
     
 
-    <!-- group all game name into 1 gamelist -->
+
+    {% for game in gamelists%}
+        <ul>
+            <li>{{game.title}} | <a href="/gamelist/{{game.id}}/edit">Edit</a> </li> 
+        </ul>
+    {% endfor %}
+
+    <!-- group all game name into 1 gamelist
 
     {% for title, games in gamelists|groupby('title') %}
         <ul>
@@ -31,6 +38,6 @@
                 </i>
             {% endfor %}
         </ul>
-    {% endfor %}
+    {% endfor %} -->
 
 {% endblock %}

@@ -34,7 +34,6 @@ class GameList(db.Model):
 
     id = db.Column (db.Integer, primary_key = True, autoincrement = True)
     title = db.Column (db.Text, nullable = False) 
-    name = db.Column (db.Text, nullable = False)
     description = db.Column (db.Text, nullable = False)
     user_id = db.Column (db.Integer, db.ForeignKey("users.id"),nullable = False)
 

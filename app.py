@@ -7,7 +7,7 @@ from sqlalchemy.exc import IntegrityError
 
 
 
-from forms import UserAddForm, LoginForm, GameListForm, DeleteForm, ReviewForm
+from forms import UserAddForm, LoginForm, GameListForm, DeleteForm, ReviewForm, SingleGameForm
 from models import db, connect_db, Game, User, Image, Video, Review, Game_Gamelist, GameList
 
 
@@ -147,7 +147,7 @@ def homepage():
         return render_template ("home-anon.html")
     
 ##############################################################################
-# USER PROFILE ROUTE
+#ACCOUNT ROUTE
 
 @app.route('/account/user/<int:user_id>')
 def show_user_account(user_id):
@@ -184,11 +184,13 @@ def edit_user_account(user_id):
     return render_template('users/edit_user.html', form=form, 
                            user=user)
 
+##############################################################################
+#USER-GAMELIST ROUTE
 
 
 @app.route('/user/<int:user_id>/gamelist')
 def check_user_profile(user_id):
-    """Show user profile"""
+    """Show user's gamelist"""
 
     
     if g.user.id != user_id:
@@ -199,13 +201,13 @@ def check_user_profile(user_id):
     gamelists = GameList.query.filter_by(user_id = user_id).all()
 
  
-    return render_template("users/userprofile.html", user = user,
+    return render_template("users/user_gamelist.html", user = user,
                             gamelists = gamelists)
 
 
-@app.route('/user/<int:user_id>/add-game', methods = ["GET", "POST"])
+@app.route('/user/<int:user_id>/gamelist/add', methods = ["GET", "POST"])
 def add_user_games(user_id):
-    """adds gameslist to user's profile"""
+    """creates new gameslist for a user"""
 
     if g.user.id != user_id:
         flash("You are not authorized to view this!", "danger")
@@ -216,110 +218,22 @@ def add_user_games(user_id):
 
     if form.validate_on_submit():
         title = form.title.data
-        name = form.name.data
         description = form.description.data
 
-        game = GameList(name = name, description = description,
+        gamelist = GameList(description = description,
                         title = title, user_id = user_id)
 
-        db.session.add(game)
+        db.session.add(gamelist)
         db.session.commit()
 
         # for testing
-        gamelists = GameList.query.filter_by(user_id=user_id).all()
+        # gamelists = GameList.query.filter_by(user_id=user_id).all()
 
         return redirect(f"/user/{g.user.id}/gamelist")
     
     else: 
 
-        return render_template("boardgames/add_game.html", form = form)
-
-
-##############################################################################
-# API FUNCTIONS
-
-def get_names(name):
-    """get 4 boardgame names based on searchquery"""
-
-    res = requests.get(f"{API_BASE_URL}/search", 
-                       params = {'name': name, 'client_id': client_id })
-
-    data = res.json()
-
-    name1 = data["games"][0]["name"]
-    name2 = data["games"][1]["name"]
-    name3 = data["games"][2]["name"]
-    name4 = data["games"][3]["name"]
-
-    id1 = data["games"][0]["id"]
-    id2 = data["games"][1]["id"]
-    id3 = data["games"][2]["id"]
-    id4 = data["games"][3]["id"]
-
-    # names = {"name1": name1, "name2": name2, "name3": name3, "name4": name4}
-    name_and_id = {"name1": name1, 
-                        "name2": name2, 
-                        "name3": name3, 
-                        "name4": name4, 
-                        "id1": id1,
-                        "id2": id2,
-                        "id3": id3, 
-                        "id4": id4
-                        }
-    return name_and_id
-
-
-def get_gameinfo(game_official_id):
-    """gets all the game information form the API"""
-
-
-    res = requests.get(f"{API_BASE_URL}/search", 
-                       params = {'ids': game_official_id, 'client_id': client_id })
-    
-    # import pdb; pdb.set_trace()
-    data = res.json()
-
-    name = data["games"][0]["name"]
-    description = data["games"][0]["description"]
-    lowest_price = data["games"][0]["price"]
-    year_published = data["games"][0]["year_published"]
-    MSRP = data["games"][0]["msrp"]
-    min_players =data["games"][0]["min_players"]
-    max_players =data["games"][0]["max_players"]
-    mechanics = data["games"][0].get("mechanics",None)
-    thumb_url = data["games"][0]["thumb_url"]
-
-    game_details = {"name": name, "description": description, "lowest_price": lowest_price, 
-                    "year_published": year_published, "MSRP": MSRP, "min_players": min_players,
-                    "max_players": max_players,
-                    "mechanics": mechanics, 
-                    "thumb_url": thumb_url
-                    }
-    
-    return game_details
-
-##############################################################################
-# BOARD GAME ROUTE
-
-@app.route('/boardgamelist')
-def get_boardgamelist():
-    """Show 4 boardgame names"""
-
-    name = request.args["name"]
-    
-    name_and_id = get_names(name)
-    return render_template("home.html", name_and_id = name_and_id)
-
-
-@app.route('/boardgamelist/<game_official_id>')
-def get_selected_boardgame(game_official_id):
-    """show details for a chosen boardgame"""
-
-    game_details = get_gameinfo(game_official_id)
-
-    return render_template ('boardgames/game_description.html',
-                           game_details = game_details, 
-                           )
+        return render_template("boardgames/add_gamelist.html", form = form)
 
 
 @app.route('/gamelist/<int:gamelist_id>/edit', methods=['GET', 'POST'])
@@ -367,6 +281,94 @@ def delete_gamelist(gamelist_id):
         db.session.commit()
 
     return redirect(f"/user/{g.user.id}/gamelist")
+
+
+
+##############################################################################
+# GAMELIST ROUTE
+
+
+@app.route('/boardgamelist')
+def get_boardgamelist():
+    """Show 4 boardgame names"""
+
+    name = request.args["name"]
+    
+    name_and_id = get_names(name)
+    return render_template("home.html", name_and_id = name_and_id)
+
+
+@app.route('/game/<game_official_id>')
+def show_selected_game(game_official_id):
+    """show details for a chosen boardgame"""
+
+    game_details = get_gameinfo(game_official_id)
+
+    return render_template ('boardgames/game_description.html',
+                           game_details = game_details, 
+                           game_official_id=game_official_id
+                           )
+
+@app.route('/game/<game_official_id>/add', methods = ["GET", "POST"])
+def add_selected_game(game_official_id):
+
+
+    #get the data form API
+    game_details = get_gameinfo(game_official_id)
+
+    # user_id = session.get('user_id')
+    
+    # if g.user.id != user_id:
+    #     flash("You are not authorized to view this!", "danger")
+    #     return redirect("/")
+
+    
+    form = SingleGameForm(name=game_details["name"])
+
+    if form.validate_on_submit():
+        name = form.name.data
+        description = form.description.data
+
+        game = Game(name=name, description=description)
+
+        db.session.add(game)
+        db.session.commit()
+
+        return redirect("/")
+
+    else:
+        return render_template("boardgames/add_single_game.html", form=form,
+                               game_details = game_details["name"])
+
+
+
+
+
+# if g.user.id != user_id:
+#         flash("You are not authorized to view this!", "danger")
+#         return redirect("/")   
+    
+
+#     form = GameListForm()
+
+#     if form.validate_on_submit():
+#         title = form.title.data
+#         description = form.description.data
+
+#         game = GameList(description = description,
+#                         title = title, user_id = user_id)
+
+#         db.session.add(game)
+#         db.session.commit()
+
+#         # for testing
+#         gamelists = GameList.query.filter_by(user_id=user_id).all()
+
+#         return redirect(f"/user/{g.user.id}/gamelist")
+    
+#     else: 
+
+#         return render_template("boardgames/add_gamelist.html", form = form)
 
 
 ##############################################################################
@@ -456,4 +458,66 @@ def delete_review(gamelist_id):
         db.session.commit()
 
     return redirect(f"/gamelist/{gamelist_id}/review")
+
 ##############################################################################
+# API FUNCTIONS
+
+def get_names(name):
+    """get 4 boardgame names based on searchquery"""
+
+    res = requests.get(f"{API_BASE_URL}/search", 
+                       params = {'name': name, 'client_id': client_id })
+
+    data = res.json()
+
+    name1 = data["games"][0]["name"]
+    name2 = data["games"][1]["name"]
+    name3 = data["games"][2]["name"]
+    name4 = data["games"][3]["name"]
+
+    id1 = data["games"][0]["id"]
+    id2 = data["games"][1]["id"]
+    id3 = data["games"][2]["id"]
+    id4 = data["games"][3]["id"]
+
+    # names = {"name1": name1, "name2": name2, "name3": name3, "name4": name4}
+    name_and_id = {"name1": name1, 
+                        "name2": name2, 
+                        "name3": name3, 
+                        "name4": name4, 
+                        "id1": id1,
+                        "id2": id2,
+                        "id3": id3, 
+                        "id4": id4
+                        }
+    return name_and_id
+
+
+def get_gameinfo(game_official_id):
+    """gets all the game information form the API"""
+
+
+    res = requests.get(f"{API_BASE_URL}/search", 
+                       params = {'ids': game_official_id, 'client_id': client_id })
+    
+    # import pdb; pdb.set_trace()
+    data = res.json()
+
+    name = data["games"][0]["name"]
+    description = data["games"][0]["description"]
+    lowest_price = data["games"][0]["price"]
+    year_published = data["games"][0]["year_published"]
+    MSRP = data["games"][0]["msrp"]
+    min_players =data["games"][0]["min_players"]
+    max_players =data["games"][0]["max_players"]
+    mechanics = data["games"][0].get("mechanics",None)
+    thumb_url = data["games"][0]["thumb_url"]
+
+    game_details = {"name": name, "description": description, "lowest_price": lowest_price, 
+                    "year_published": year_published, "MSRP": MSRP, "min_players": min_players,
+                    "max_players": max_players,
+                    "mechanics": mechanics, 
+                    "thumb_url": thumb_url
+                    }
+    
+    return game_details

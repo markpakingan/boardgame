@@ -18,11 +18,14 @@ class LoginForm(FlaskForm):
     username = StringField("Username", validators=[DataRequired()])
     password = PasswordField("Password", validators=[Length(min=6)])
 
+class SingleGameForm(FlaskForm):
+
+    name = StringField("Name",validators=[DataRequired()])
+    description = StringField("Description",validators=[DataRequired()])
 
 class GameListForm(FlaskForm):
 
     title = StringField("GameList Title",validators=[DataRequired()])
-    name = StringField("Name",validators=[DataRequired()])
     description = StringField("Description",validators=[DataRequired()])
 
 
