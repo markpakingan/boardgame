@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h1>Edit Your Game!</h1>
+
+
+  <form method="POST">
+    {{ form.hidden_tag() }}
+
+    {{form.name.label}} {{form.name()}} 
+    {{ form.description.label }} {{ form.description() }}
+    <button type="submit">Save Changes</button>
+  </form>
+
+
+  <form method="POST" 
+    action="">   
+    {{ form.hidden_tag() }}                 
+    <button class="btn btn-outline-danger" name = "submit">Delete</button>
+  </form>
+
+
+{% endblock %}

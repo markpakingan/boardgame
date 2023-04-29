@@ -15,11 +15,20 @@
     
 
 
-    {% for game in gamelists%}
-        <ul>
-            <li>{{game.title}} | <a href="/gamelist/{{game.id}}/edit">Edit</a> </li> 
-        </ul>
-    {% endfor %}
+    {% if gamelists %}
+
+        {% for game in gamelists%}
+            <ul>
+                <li>{{game.title}} | <a href="/gamelist/{{game.id}}/edit">Edit</a> </li> 
+            </ul>
+        {% endfor %}
+
+        {% else %}
+            <i><p>*YOU HAVE NO GAMELIST!*</p></i>
+    {% endif %}
+
+
+
 
     <!-- group all game name into 1 gamelist
 

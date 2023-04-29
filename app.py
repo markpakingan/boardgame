@@ -187,7 +187,63 @@ def edit_user_account(user_id):
 ##############################################################################
 #USER-GAMELIST ROUTE
 
+@app.route('/user/<int:user_id>/games')
+def show_all_games(user_id):
+    """Show all user's games"""
 
+    if g.user.id != user_id:
+        flash("You are not authorized to view this!", "danger")
+        return redirect("/")  
+    
+    return render_template("users/user_games.html")
+
+@app.route('/user/<int:user_id>/games/add', methods = ["GET", "POST"])
+def add_single_game(user_id):
+    """Manually adds a game"""
+
+    if g.user.id != user_id:
+        flash("You are not authorized to view this!", "danger")
+        return redirect("/")  
+    
+    form = SingleGameForm()
+
+    if form.validate_on_submit():
+        name = form.name.data
+        description = form.description.data
+
+        game = Game(name=name, 
+                    description=description, user_id=user_id)
+        
+        db.session.add(game)
+        db.session.commit()
+
+        return redirect(f'/user/{g.user.id}/games')
+
+    else: 
+        return render_template("boardgames/add_single_game.html", form=form)
+    
+@app.route('/user/<int:user_id>/games/edit', methods = ["GET", "POST"])
+def edit_single_game(user_id):
+    """Edit single game from the user"""
+
+    games = Game.query.filter_by(user_id=user_id).all()
+
+    if g.user.id != user_id:
+        flash("You are not authorized to view this!", "danger")
+        return redirect("/")
+    
+    form = SingleGameForm(obj=games)
+
+    if form.validate_on_submit():
+        form.populate_obj(games)
+        db.session.commit()
+        flash('Game Has Been Updated!', 'success')
+        return redirect(f'/user/{g.user.id}/games')
+    
+    return render_template('boardgames/edit_game.html', form=form, 
+                           games=games)
+
+    
 @app.route('/user/<int:user_id>/gamelist')
 def check_user_profile(user_id):
     """Show user's gamelist"""
@@ -226,9 +282,7 @@ def add_user_games(user_id):
         db.session.add(gamelist)
         db.session.commit()
 
-        # for testing
-        # gamelists = GameList.query.filter_by(user_id=user_id).all()
-
+        
         return redirect(f"/user/{g.user.id}/gamelist")
     
     else: 
@@ -285,8 +339,7 @@ def delete_gamelist(gamelist_id):
 
 
 ##############################################################################
-# GAMELIST ROUTE
-
+# SINGLE GAME ROUTE
 
 @app.route('/boardgamelist')
 def get_boardgamelist():
@@ -316,7 +369,7 @@ def add_selected_game(game_official_id):
     #get the data form API
     game_details = get_gameinfo(game_official_id)
 
-    # user_id = session.get('user_id')
+    user_id = g.user.id
     
     # if g.user.id != user_id:
     #     flash("You are not authorized to view this!", "danger")
@@ -329,7 +382,7 @@ def add_selected_game(game_official_id):
         name = form.name.data
         description = form.description.data
 
-        game = Game(name=name, description=description)
+        game = Game(name=name, description=description, user_id=user_id)
 
         db.session.add(game)
         db.session.commit()
@@ -339,36 +392,6 @@ def add_selected_game(game_official_id):
     else:
         return render_template("boardgames/add_single_game.html", form=form,
                                game_details = game_details["name"])
-
-
-
-
-
-# if g.user.id != user_id:
-#         flash("You are not authorized to view this!", "danger")
-#         return redirect("/")   
-    
-
-#     form = GameListForm()
-
-#     if form.validate_on_submit():
-#         title = form.title.data
-#         description = form.description.data
-
-#         game = GameList(description = description,
-#                         title = title, user_id = user_id)
-
-#         db.session.add(game)
-#         db.session.commit()
-
-#         # for testing
-#         gamelists = GameList.query.filter_by(user_id=user_id).all()
-
-#         return redirect(f"/user/{g.user.id}/gamelist")
-    
-#     else: 
-
-#         return render_template("boardgames/add_gamelist.html", form = form)
 
 
 ##############################################################################
