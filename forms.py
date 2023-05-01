@@ -35,6 +35,17 @@ class ReviewForm(FlaskForm):
                                             ("5", "5")] , 
                                             validators=[DataRequired()])
     feedback = StringField("Feedback", validators=[DataRequired()])
+
+
+class NewGameForGamelistForm(FlaskForm):
+    """Form for adding a game to playlist."""
+
+    # changed coerce = int to str.
+
+    game = SelectField('Game To Add', coerce=int)
+    
+
+
     
 class DeleteForm(FlaskForm):
     """Delete form -- this form is intentionally blank."""

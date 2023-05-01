@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h1>Add Game to {{ gamelist.title }} Collection</h1>
+  <hr>
+  <form method="POST">
+    {{ form.hidden_tag() }}
+    {{ form.game.label }} {{ form.game() }}
+    <button type="submit">Add Game</button>
+  </form>
+{% endblock %}

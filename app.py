@@ -7,7 +7,7 @@ from sqlalchemy.exc import IntegrityError
 
 
 
-from forms import UserAddForm, LoginForm, GameListForm, DeleteForm, ReviewForm, SingleGameForm
+from forms import UserAddForm, LoginForm, GameListForm, DeleteForm, ReviewForm, SingleGameForm, NewGameForGamelistForm
 from models import db, connect_db, Game, User, Image, Video, Review, Game_Gamelist, GameList
 
 
@@ -195,7 +195,9 @@ def show_all_games(user_id):
         flash("You are not authorized to view this!", "danger")
         return redirect("/")  
     
-    return render_template("users/user_games.html")
+    games = Game.query.filter_by(user_id=user_id).all()
+
+    return render_template("users/all_games.html", games=games)
 
 @app.route('/user/<int:user_id>/games/add', methods = ["GET", "POST"])
 def add_single_game(user_id):
@@ -245,9 +247,8 @@ def edit_single_game(user_id):
 
     
 @app.route('/user/<int:user_id>/gamelist')
-def check_user_profile(user_id):
+def show_all_gamelists(user_id):
     """Show user's gamelist"""
-
     
     if g.user.id != user_id:
         flash("You are not authorized to view this!", "danger")
@@ -257,8 +258,26 @@ def check_user_profile(user_id):
     gamelists = GameList.query.filter_by(user_id = user_id).all()
 
  
-    return render_template("users/user_gamelist.html", user = user,
+    return render_template("users/all_gamelists.html", user = user,
                             gamelists = gamelists)
+
+    
+
+@app.route('/gamelist/<int:gamelist_id>')
+def show_gamelist_info(gamelist_id):
+    """show gamelist info"""
+    
+    gamelist = GameList.query.get_or_404(gamelist_id)
+
+
+    if g.user.id != gamelist.user_id:
+        flash("You are not authorized to view this!", "danger")
+        return redirect("/")
+
+    # render the gamelist info
+    return render_template("users/gamelist.html", gamelist=gamelist)
+
+
 
 
 @app.route('/user/<int:user_id>/gamelist/add', methods = ["GET", "POST"])
@@ -336,6 +355,27 @@ def delete_gamelist(gamelist_id):
 
     return redirect(f"/user/{g.user.id}/gamelist")
 
+
+
+@app.route('/gamelist/<int:gamelist_id>/add-game', methods = ["GET", "POST"])
+def add_game_to_gamelist(gamelist_id):
+    """Add a game to gamelist"""
+
+    gamelist = GameList.query.get_or_404(gamelist_id)
+    form = NewGameForGamelistForm()
+
+    form.game.choices = [(game.id, game.name) for game in Game.query.all()]
+    
+    if form.validate_on_submit():
+        game = Game.query.get(form.game.data)
+        game_gamelist = Game_Gamelist(game_id=game.id, gamelist_id=gamelist.id)
+        db.session.add(game_gamelist)
+        db.session.commit()
+        flash(f'{game.name} added to {gamelist.title} collection!', 'success')
+        return redirect("/")
+
+    return render_template('users/add_game_to_gamelist.html', form=form, 
+                           gamelist=gamelist)
 
 
 ##############################################################################

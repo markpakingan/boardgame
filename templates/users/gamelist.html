@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    {% if gamelist %}
+        
+        <h1>{{gamelist.title}} Collection</h1>
+        <hr>
+        <p>Here are your games:</p>
+
+
+    <button>Add Game To This Gamelist</button>
+
+    {% else%}
+
+        <p>There are no current games here</p>
+
+    {% endif %}
+
+{% endblock %}
