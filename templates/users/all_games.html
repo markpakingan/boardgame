@@ -10,8 +10,12 @@
         {% for game in games %}
 
         <ul>
-            <li><a href="/user/{{g.user.id}}/games/{{game.id}}">{{game.name}}</a></li>
+            <li>
+                <a href="/user/{{g.user.id}}/games/{{game.id}}">{{game.name}}
+                </a> | <a href="/user/{{g.user.id}}/games/{{game.id}}/edit">Edit </a>
+            </li> 
         </ul>
+
 
     {% endfor %}
 

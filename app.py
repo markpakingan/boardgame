@@ -130,8 +130,6 @@ def logout():
     do_logout()
     return redirect ("/")
 
-##############################################################################
-# HOMEPAGE
 
 @app.route('/')
 def homepage():
@@ -215,6 +213,7 @@ def show_game_info(user_id, game_id):
     
     return render_template("users/game.html", game=game, gamelists=gamelists)
 
+
 @app.route('/user/<int:user_id>/games/add', methods = ["GET", "POST"])
 def add_single_game(user_id):
     """Manually adds a game"""
@@ -240,11 +239,12 @@ def add_single_game(user_id):
     else: 
         return render_template("boardgames/add_single_game.html", form=form)
     
-@app.route('/user/<int:user_id>/games/edit', methods = ["GET", "POST"])
-def edit_single_game(user_id):
+    
+@app.route('/user/<int:user_id>/games/<int:game_id>/edit', methods = ["GET", "POST"])
+def edit_single_game(user_id, game_id):
     """Edit single game from the user"""
 
-    games = Game.query.filter_by(user_id=user_id).all()
+    games = Game.query.get(game_id)
 
     if g.user.id != user_id:
         flash("You are not authorized to view this!", "danger")
@@ -261,6 +261,23 @@ def edit_single_game(user_id):
     return render_template('boardgames/edit_game.html', form=form, 
                            games=games)
 
+@app.route('/user/<int:user_id>/games/<int:game_id>/delete', methods=['POST'])
+def delete_game (user_id, game_id):
+    """Deletes a single game"""
+
+    games = Game.query.get_or_404(game_id)
+
+    if g.user.id != user_id:
+        flash("You are not authorized to view this!", "danger")
+        return redirect("/")   
+    
+    form = DeleteForm()
+
+    if form.validate_on_submit():
+        db.session.delete(games)
+        db.session.commit()
+
+    return redirect(f"/user/{g.user.id}/games")
 ##############################################################################
 #GAMELIST ROUTE
 
@@ -327,6 +344,31 @@ def add_user_games(user_id):
     else: 
 
         return render_template("boardgames/add_gamelist.html", form = form)
+    
+
+@app.route('/user/<int:user_id>/gamelist/<int:gamelist_id>/add-game', methods = ["GET", "POST"])
+def add_game_to_gamelist(user_id, gamelist_id):
+    """Add a game to a specific gamelist"""
+
+    gamelist = GameList.query.get_or_404(gamelist_id)
+    form = NewGameForGamelistForm()
+
+    if g.user.id != user_id:
+        flash("You are not authorized to view this!", "danger")
+        return redirect("/")
+
+    form.game.choices = [(game.id, game.name) for game in Game.query.all()]
+    
+    if form.validate_on_submit():
+        game = Game.query.get(form.game.data)
+        game_gamelist = Game_Gamelist(game_id=game.id, gamelist_id=gamelist.id)
+        db.session.add(game_gamelist)
+        db.session.commit()
+        flash(f'{game.name} added to {gamelist.title} collection!', 'success')
+        return redirect(f'/user/{g.user.id}/gamelist')
+
+    return render_template('users/add_game_to_gamelist.html', form=form, 
+                           gamelist=gamelist)
 
 
 @app.route('/user/<int:user_id>/gamelist/<int:gamelist_id>/edit', methods=['GET', 'POST'])
@@ -358,10 +400,7 @@ def edit_gamelist(user_id, gamelist_id):
 def delete_gamelist(user_id, gamelist_id):
     """Deletes a single boardgame"""
 
-    
     gamelist = GameList.query.get_or_404(gamelist_id)
-    # user_id = gamelist.user_id
-
 
     if g.user.id != user_id:
         flash("You are not authorized to view this!", "danger")
@@ -374,33 +413,6 @@ def delete_gamelist(user_id, gamelist_id):
         db.session.commit()
 
     return redirect(f"/user/{g.user.id}/gamelist")
-
-
-
-@app.route('/user/<int:user_id>/gamelist/<int:gamelist_id>/add-game', methods = ["GET", "POST"])
-def add_game_to_gamelist(user_id, gamelist_id):
-    """Add a game to a specific gamelist"""
-
-    gamelist = GameList.query.get_or_404(gamelist_id)
-    form = NewGameForGamelistForm()
-
-    if g.user.id != user_id:
-        flash("You are not authorized to view this!", "danger")
-        return redirect("/")
-
-    form.game.choices = [(game.id, game.name) for game in Game.query.all()]
-    
-    if form.validate_on_submit():
-        game = Game.query.get(form.game.data)
-        game_gamelist = Game_Gamelist(game_id=game.id, gamelist_id=gamelist.id)
-        db.session.add(game_gamelist)
-        db.session.commit()
-        flash(f'{game.name} added to {gamelist.title} collection!', 'success')
-        return redirect(f'/user/{g.user.id}/gamelist')
-
-    return render_template('users/add_game_to_gamelist.html', form=form, 
-                           gamelist=gamelist)
-
 
 ##############################################################################
 # SINGLE GAME ROUTE
@@ -434,12 +446,7 @@ def add_selected_game(game_official_id):
     game_details = get_gameinfo(game_official_id)
 
     user_id = g.user.id
-    
-    # if g.user.id != user_id:
-    #     flash("You are not authorized to view this!", "danger")
-    #     return redirect("/")
-
-    
+       
     form = SingleGameForm(name=game_details["name"])
 
     if form.validate_on_submit():

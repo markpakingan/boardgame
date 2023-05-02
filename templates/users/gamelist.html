@@ -12,7 +12,11 @@
         {% for game in games%}
 
         <ul>
-            <li>{{game.name}}</li>
+                <li>
+                    <a href="/user/{{g.user.id}}/games/{{game.id}}">
+                    {{game.name}}
+                    </a>
+                </li>
         </ul>
         {% endfor %}
 

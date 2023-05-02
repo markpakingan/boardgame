@@ -8,8 +8,15 @@
 
     <p>This game is in the following gamelist:</p>
     <ul>
+
         {% for gamelist in gamelists %}
-            <li>{{ gamelist.title }}</li>
+
+            
+            <li>
+                {{ gamelist.title }}
+            </li>
+          
+
         {% endfor %}
     </ul>
 
