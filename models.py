@@ -26,8 +26,9 @@ class Game(db.Model):
     mechanics = db.Column(db.Text, nullable = True )
     artists= db.Column(db.Text, nullable = True )
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
-    # gamelists = db.relationship("GameList", secondary = "game_gamelists", backref = "games")
 
+    gamelists = db.relationship("GameList", secondary="game_gamelists", back_populates="games")
+    
 class GameList(db.Model):
 
     __tablename__ = "gamelists"
@@ -37,6 +38,8 @@ class GameList(db.Model):
     description = db.Column (db.Text, nullable = False)
     user_id = db.Column (db.Integer, db.ForeignKey("users.id"),nullable = False)
 
+    games = db.relationship("Game", secondary="game_gamelists", back_populates="gamelists")
+
 
 class Game_Gamelist (db.Model):
 
@@ -44,11 +47,6 @@ class Game_Gamelist (db.Model):
 
     id = db.Column (db.Integer, primary_key = True, autoincrement = True)
     game_id = db.Column (db.Integer, db.ForeignKey("games.id"), nullable = False)
-    
-    # This is incorrect
-    # user_id = db.Column (db.Integer, db.ForeignKey("users.id"), nullable = False)
-    
-    # This is what Raymon recommended
     gamelist_id = db.Column (db.Integer, db.ForeignKey("gamelists.id"), nullable = False)
 
 

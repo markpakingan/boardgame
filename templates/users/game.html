@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    <h1>About {{game.name}} : </h1>
+    <hr>
+
+
+    <p>This game is in the following gamelist:</p>
+    <ul>
+        {% for gamelist in gamelists %}
+            <li>{{ gamelist.title }}</li>
+        {% endfor %}
+    </ul>
+
+    <a href="/user/{{g.user.id}}/gamelist/add">
+        <button>
+            Add To Gamelist
+        </button>
+    </a>
+  
+
+{% endblock %}

@@ -4,12 +4,12 @@
 {% block content%}
 
     <h2>
-        Hi {{user.username}}!
+        Hi {{users.username}}!
     </h2>
     
     <br>
     <p><i>Ready to Create Your Own GameList? 
-        <a href="/user/{{user.id}}/gamelist/add">Click Here</a></i></p>
+        <a href="/user/{{g.user.id}}/gamelist/add">Click Here</a></i></p>
     
     <b><p>HERE ARE YOUR GAMELIST:</p></b>
     
@@ -19,7 +19,8 @@
 
         {% for game in gamelists%}
             <ul>
-                <li>{{game.title}} | <a href="/gamelist/{{game.id}}/edit">Edit</a> </li> 
+                <li><a href="/user/{{g.user.id}}/gamelist/{{game.id}}">{{game.title}}</a> |
+                     <a href="/user/{{g.user.id}}/gamelist/{{game.id}}/edit">Edit Name</a> </li> 
             </ul>
         {% endfor %}
 

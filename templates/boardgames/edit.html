@@ -14,7 +14,7 @@
 
 
   <form method="POST" 
-    action="/gamelist/{{gamelist.id}}/delete">   
+    action="/user/{{g.user.id}}/gamelist/{{gamelist.id}}/delete">   
     {{ form.hidden_tag() }}                 
     <button class="btn btn-outline-danger" name = "submit">Delete</button>
   </form>

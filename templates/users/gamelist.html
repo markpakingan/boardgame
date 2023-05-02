@@ -9,7 +9,16 @@
         <p>Here are your games:</p>
 
 
-    <button>Add Game To This Gamelist</button>
+        {% for game in games%}
+
+        <ul>
+            <li>{{game.name}}</li>
+        </ul>
+        {% endfor %}
+
+    <a href="/user/{{g.user.id}}/gamelist/{{gamelist.id}}/add-game">
+        <button>Add Game To This Gamelist</button>
+    </a>
 
     {% else%}
 
