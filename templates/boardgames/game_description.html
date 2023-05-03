@@ -8,15 +8,27 @@
         
         {% if game_details %}
         <ul>
-                </b><img src='{{game_details["thumb_url"]}}'></li>
+
+                <div class="api-image">
+                        <li>
+                                <img src='{{game_details["thumb_url"]}}'>
+                        </li>
+                </div>
                 
                 <br>
-                <a href="/game/{{game_official_id}}/add">Add This Game</a>
+
+                <button> 
+                        <a href="/game/{{game_official_id}}/add">Add This Game
+                        </a>
+                </button>
+
+
+                <br>
                 <br>
 
-                <li><b>Description: 
+                <li><b>Description:</b> 
                         <br>
-                        </b> {{game_details["description"]|safe}}</li>
+                        {{game_details["description"]|safe}}</li>
                 <li><b> No. of Players: </b>{{game_details["min_players"]}} - {{game_details["max_players"]}} </li>
                 <li><b> Lowest Price: </b>{{game_details["lowest_price"]}}</li>
                 <li><b> Year Published: </b>{{game_details["year_published"]}}</li>

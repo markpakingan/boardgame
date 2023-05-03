@@ -1,15 +1,25 @@
 {% extends "base.html" %}
 
 
+
+
+
 {% block content%}
+
+
+    <br>
 
     <h2>
         Hi {{users.username}}!
     </h2>
     
     <br>
-    <p><i>Ready to Create Your Own GameList? 
-        <a href="/user/{{g.user.id}}/gamelist/add">Click Here</a></i></p>
+
+    <div class="create-link">
+        <p><i>Ready to Create Your Own GameList? 
+            <a href="/user/{{g.user.id}}/gamelist/add">Click Here</a></i></p>
+    </div>
+  
     
     <b><p>HERE ARE YOUR GAMELIST:</p></b>
     

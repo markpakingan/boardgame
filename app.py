@@ -415,7 +415,7 @@ def delete_gamelist(user_id, gamelist_id):
     return redirect(f"/user/{g.user.id}/gamelist")
 
 ##############################################################################
-# SINGLE GAME ROUTE
+# API GAME ROUTE
 
 @app.route('/boardgamelist')
 def get_boardgamelist():

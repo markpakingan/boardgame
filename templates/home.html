@@ -3,21 +3,29 @@
 
 {% block content %}
 
-    <div class="row justify-content-md-center">
-        
+
+    <div class="boardgamebanner">
+    
         <h1>Ready To Search For Your Next BoardGame?</h1>
 
-       <form action="/boardgamelist" method ="GET">
-            <input type="text" name="name" id="" placeholder="Enter Board Game Name">
-            <button>Search</button>
-       </form>
+    
+    <br>
+
+        <div class="searchbar">
+            <form action="/boardgamelist" method ="GET">
+                <input type="text" name="name" id="" placeholder="Enter Board Game Name">
+                <button>Search</button>
+           </form>    
+        </div>
+        
         
     </div>
 
     <br>
 
             {% if name_and_id %}
-                    Search Results:
+                    <h2>Search Results:</h2>
+                    
                     <hr>
                     <ul>
                         <li><a href='/game/{{name_and_id["id1"]}}'>
