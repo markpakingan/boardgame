@@ -50,21 +50,21 @@ class Game_Gamelist (db.Model):
     gamelist_id = db.Column (db.Integer, db.ForeignKey("gamelists.id"), nullable = False)
 
 
-class Video(db.Model):
+# class Video(db.Model):
 
-    __tablename__= "videos"
+#     __tablename__= "videos"
 
-    id = db.Column(db.Integer, primary_key = True, autoincrement = True)
-    url = db.Column (db.Text, nullable = False)
-    games_id = db.Column(db.Integer, db.ForeignKey("games.id"), nullable = False )
+#     id = db.Column(db.Integer, primary_key = True, autoincrement = True)
+#     url = db.Column (db.Text, nullable = False)
+#     games_id = db.Column(db.Integer, db.ForeignKey("games.id"), nullable = False )
 
-class Image(db.Model):
+# class Image(db.Model):
 
-    __tablename__= "images"
+#     __tablename__= "images"
 
-    id = db.Column(db.Integer, primary_key = True, autoincrement = True)
-    url = db.Column (db.Text, nullable = False)
-    games_id = db.Column(db.Integer, db.ForeignKey("games.id"), nullable = False )
+#     id = db.Column(db.Integer, primary_key = True, autoincrement = True)
+#     url = db.Column (db.Text, nullable = False)
+#     games_id = db.Column(db.Integer, db.ForeignKey("games.id"), nullable = False )
 
 class Review(db.Model):
 
@@ -73,7 +73,7 @@ class Review(db.Model):
     # to revise this
     id = db.Column(db.Integer, primary_key = True, autoincrement = True)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable = False )
-    gamelist_id = db.Column(db.Integer, db.ForeignKey("gamelists.id"), nullable = False )
+    game_id = db.Column(db.Integer, db.ForeignKey("games.id"), nullable = False )
     rating = db.Column (db.Integer, nullable = False)
     feedback = db.Column (db.Text, nullable = False)
 

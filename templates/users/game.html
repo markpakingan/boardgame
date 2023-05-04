@@ -9,18 +9,28 @@
     <p>This game is in the following gamelist:</p>
     <ul>
 
-        {% for gamelist in gamelists %}
+    {% for gamelist in gamelists %}
 
+        <li>
+        <div class="gamelist-title">
+            {{ gamelist.title }} |
+        </div>
             
-            <li>
-                {{ gamelist.title }}
-            </li>
-          
+        <div class="small-delete-button">
+            <form action="/user/{{ g.user.id }}/games/{{ game.id }}/gamelist/{{ gamelist.id }}/delete" method="post">
+                <input type="hidden" name="_method" value="DELETE">
+                <button type="submit">Delete</button>
+            </form>
+        </div>
+        </li>
 
-        {% endfor %}
+
+    {% endfor %}
+
+
     </ul>
 
-    <a href="/user/{{g.user.id}}/gamelist/add">
+    <a href="/user/{{g.user.id}}/games/{{game.id}}/choose-gamelist">
         <button>
             Add To Gamelist
         </button>

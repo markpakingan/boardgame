@@ -7,7 +7,7 @@ from sqlalchemy.exc import IntegrityError
 
 
 
-from forms import UserAddForm, LoginForm, GameListForm, DeleteForm, ReviewForm, SingleGameForm, NewGameForGamelistForm
+from forms import UserAddForm, LoginForm, GameListForm, DeleteForm, ReviewForm, SingleGameForm, NewGameForGamelistForm, NewGameListDropDownForm
 from models import db, connect_db, Game, User, Image, Video, Review, Game_Gamelist, GameList
 
 
@@ -206,6 +206,7 @@ def show_game_info(user_id, game_id):
         flash("You are not authorized to view this!", "danger")
         return redirect("/")  
     
+    
     game = Game.query.get_or_404(game_id)
 
     # for testing
@@ -278,6 +279,56 @@ def delete_game (user_id, game_id):
         db.session.commit()
 
     return redirect(f"/user/{g.user.id}/games")
+
+
+@app.route('/user/<int:user_id>/games/<int:game_id>/choose-gamelist', methods = ["GET", "POST"])
+def add_game_to_gamelist(user_id, game_id):
+    """Add a game to a specific gamelist"""
+
+    games = Game.query.get_or_404(game_id)
+    form = NewGameListDropDownForm()
+
+    if g.user.id != user_id:
+        flash("You are not authorized to view this!", "danger")
+        return redirect("/")
+
+    form.gamelist.choices = [(gamelist.id, gamelist.title)for gamelist in 
+                             db.session.query(GameList).all()]
+    
+    if form.validate_on_submit():
+
+        gamelist = GameList.query.get(form.gamelist.data)
+        games.gamelists.append(gamelist)
+
+        db.session.commit()
+        return redirect (f"/user/{g.user.id}/games/{game_id}")
+    
+    return render_template("users/pick_playlist.html",
+                             games=games,
+                             form=form)
+
+
+@app.route('/user/<int:user_id>/games/<int:game_id>/gamelist/<int:gamelist_id>/delete', methods=['POST'])
+def remove_game_from_gamelist(user_id, game_id, gamelist_id):
+    """Removes a game from a gamelist"""
+
+    # Get the game and gamelist objects from the database
+    game = Game.query.get_or_404(game_id)
+    gamelist = GameList.query.get_or_404(gamelist_id)
+
+    # Check if the logged-in user is authorized to remove the game from the gamelist
+    if g.user.id != user_id:
+        flash("You are not authorized to perform this action!", "danger")
+        return redirect("/")   
+
+    # Remove the game from the gamelist and commit the changes to the database
+    gamelist.games.remove(game)
+    db.session.commit()
+
+    flash("Game removed from playlist!", "success")
+    return redirect(f'/user/{user_id}/games/{game_id}')
+
+
 ##############################################################################
 #GAMELIST ROUTE
 
@@ -347,7 +398,7 @@ def add_user_games(user_id):
     
 
 @app.route('/user/<int:user_id>/gamelist/<int:gamelist_id>/add-game', methods = ["GET", "POST"])
-def add_game_to_gamelist(user_id, gamelist_id):
+def add_games_on_dropdown(user_id, gamelist_id):
     """Add a game to a specific gamelist"""
 
     gamelist = GameList.query.get_or_404(gamelist_id)
@@ -447,7 +498,8 @@ def add_selected_game(game_official_id):
 
     user_id = g.user.id
        
-    form = SingleGameForm(name=game_details["name"])
+    form = SingleGameForm(name=game_details["name"],
+                          description=game_details["description"])
 
     if form.validate_on_submit():
         name = form.name.data
@@ -465,10 +517,11 @@ def add_selected_game(game_official_id):
                                game_details = game_details["name"])
 
 
+
 ##############################################################################
 # REVIEW ROUTE
 
-@app.route('/gamelist/<int:gamelist_id>/review')
+@app.route('users/<int:user_id>/games/<int:game_id>/review')
 def show_review(gamelist_id):
     """Shows the review of a game"""
 

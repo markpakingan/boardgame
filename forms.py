@@ -45,7 +45,13 @@ class NewGameForGamelistForm(FlaskForm):
     game = SelectField('Game To Add', coerce=int)
     
 
+class NewGameListDropDownForm(FlaskForm):
+    """Form for adding a game to playlist."""
 
+    # changed coerce = int to str.
+
+    gamelist = SelectField('Add To Gamelist', coerce=int)
+    
     
 class DeleteForm(FlaskForm):
     """Delete form -- this form is intentionally blank."""

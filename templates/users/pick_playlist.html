@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h1>You Are Adding The "{{games.name}}"</h1>
+  <hr>
+  <form method="POST">
+    {{ form.hidden_tag() }}
+    {{ form.gamelist.label }} {{ form.gamelist() }}
+    <button type="submit">Add Game</button>
+  </form>
+
+  <br>
+
+  <p>Want To Create a New Gamelist? <a href="/user/{{g.user.id}}/gamelist/add">Click Here</a></p> 
+{% endblock %}
