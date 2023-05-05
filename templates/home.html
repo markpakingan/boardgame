@@ -3,29 +3,38 @@
 
 {% block content %}
 
-    <div class="row justify-content-md-center">
-        
+
+    <div class="heading">
+    
         <h1>Ready To Search For Your Next BoardGame?</h1>
 
-       <form action="/boardgamelist" method ="GET">
-            <input type="text" name="name" id="" placeholder="Enter Board Game Name">
-            <button>Search</button>
-       </form>
+    <br>
+
+        <div class="searchbar">
+            <form action="/boardgamelist" method ="GET">
+                <input type="text" name="name" id="" placeholder="Enter Board Game Name">
+                <button>Search</button>
+           </form>    
+        </div>
+        
         
     </div>
 
     <br>
 
             {% if name_and_id %}
+                    <h2>Search Results:</h2>
+                    
+                    <hr>
                     <ul>
-                        <li><a href='/boardgamelist/{{name_and_id["id1"]}}'>
-                            {{name_and_id["name1"]}} (ID # {{name_and_id["id1"]}})</a></li>
-                        <li><a href='/boardgamelist/{{name_and_id["id2"]}}'>
-                            {{name_and_id["name2"]}} (ID # {{name_and_id["id2"]}})</a></li>
-                        <li><a href='/boardgamelist/{{name_and_id["id3"]}}'>
-                            {{name_and_id["name3"]}} (ID # {{name_and_id["id3"]}})</a></li>
-                        <li><a href='/boardgamelist/{{name_and_id["id4"]}}'>
-                            {{name_and_id["name4"]}} (ID # {{name_and_id["id4"]}})</a></li>
+                        <li><a href='/game/{{name_and_id["id1"]}}'>
+                            {{name_and_id["name1"]}}</a></li>
+                        <li><a href='/game/{{name_and_id["id2"]}}'>
+                            {{name_and_id["name2"]}}</a></li>
+                        <li><a href='/game/{{name_and_id["id3"]}}'>
+                            {{name_and_id["name3"]}}</a></li>
+                        <li><a href='/game/{{name_and_id["id4"]}}'>
+                            {{name_and_id["name4"]}}</a></li>
                     </ul> 
             {% endif %}
         

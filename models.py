@@ -15,27 +15,30 @@ class Game(db.Model):
     __tablename__ = "games"
 
     id = db.Column(db.Integer, primary_key = True, autoincrement = True)
-    game_sku_id = db.Column (db.Text, nullable = True)
+    game_official_id = db.Column (db.Text, nullable = True)
     name = db.Column(db.Text, nullable = False )
-    description = db.Column(db.Text, nullable = False )
-    lowest_price = db.Column(db.Float, nullable = False )
-    MSRP = db.Column(db.Float, nullable = False )
-    image_url = db.Column(db.Text, nullable = False )
-    min_play = db.Column(db.Integer, nullable = False )
-    max_play = db.Column(db.Integer, nullable = False )
-    mechanics = db.Column(db.Text, nullable = False )
-    artists= db.Column(db.Text, nullable = False )
+    description = db.Column(db.Text, nullable = True )
+    lowest_price = db.Column(db.Float, nullable = True )
+    MSRP = db.Column(db.Float, nullable = True )
+    image_url = db.Column(db.Text, nullable = True )
+    min_play = db.Column(db.Integer, nullable = True )
+    max_play = db.Column(db.Integer, nullable = True )
+    mechanics = db.Column(db.Text, nullable = True )
+    artists= db.Column(db.Text, nullable = True )
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
 
-    # gamelists = db.relationship("GameList", secondary = "game_gamelists", backref = "games")
-
+    gamelists = db.relationship("GameList", secondary="game_gamelists", back_populates="games")
+    
 class GameList(db.Model):
 
     __tablename__ = "gamelists"
 
     id = db.Column (db.Integer, primary_key = True, autoincrement = True)
-    name = db.Column (db.Text, nullable = False)
+    title = db.Column (db.Text, nullable = False) 
     description = db.Column (db.Text, nullable = False)
-    user_id = db.Column (db.Text, db.ForeignKey("users.id"),nullable = False)
+    user_id = db.Column (db.Integer, db.ForeignKey("users.id"),nullable = False)
+
+    games = db.relationship("Game", secondary="game_gamelists", back_populates="gamelists")
 
 
 class Game_Gamelist (db.Model):
@@ -44,8 +47,7 @@ class Game_Gamelist (db.Model):
 
     id = db.Column (db.Integer, primary_key = True, autoincrement = True)
     game_id = db.Column (db.Integer, db.ForeignKey("games.id"), nullable = False)
-    user_id = db.Column (db.Integer, db.ForeignKey("users.id"), nullable = False)
-
+    gamelist_id = db.Column (db.Integer, db.ForeignKey("gamelists.id"), nullable = False)
 
 
 class Video(db.Model):
@@ -68,6 +70,7 @@ class Review(db.Model):
 
     __tablename__= "reviews"
 
+    # to revise this
     id = db.Column(db.Integer, primary_key = True, autoincrement = True)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable = False )
     game_id = db.Column(db.Integer, db.ForeignKey("games.id"), nullable = False )
@@ -84,6 +87,10 @@ class User(db.Model):
     image_url = db.Column (db.Text, nullable = True)
     email = db.Column(db.Text, nullable = False)
 
+    def __repr__(self):
+        return f"<User {self.username}>"
+    
+    
     @classmethod
     def signup(cls, username, email, password, image_url):
         """Sign up user.

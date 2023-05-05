@@ -5,6 +5,7 @@
   <meta charset="UTF-8">
   <title>BoardGame</title>
 
+  <link rel="stylesheet" href="/static/style.css">
   <link rel="stylesheet"
         href="https://unpkg.com/bootstrap/dist/css/bootstrap.css">
   <script src="https://unpkg.com/jquery"></script>
@@ -18,56 +19,54 @@
 </head>
 
 <body>
-<nav>
   <div>
     <div>
-      
-    </div>
-    <ul>
-      {% if request.endpoint != None %}
-      <li>
-        <form action="/user">
-          <input name="q">
-          <button class="btn btn-default">
-            <span class="fa fa-search"></span>
-          </button>
-        </form>x
 
-
-      </li>
-      {% endif %}
       {% if not g.user %}
-      <li><a href="/signup">Sign up</a></li>
-      <li><a href="/login">Log in</a></li>
-      {% else %}
+      <nav class="navbar my-nav" style="background-color: #8b0707;">
 
-      <li>
-        <a href="/user/{{ g.user.id }}">
-          <img src="{{ g.user.image_url }}" alt="{{ g.user.username }}">
-        </a>
-      </li>
-      <li><a href="/profile">Profile</a></li>
-      <li><a href="/logout">Log out</a></li>
+        <ul class="nav">
+          <li class="nav-item">
+            <a class="nav-link active" href="/signup">Sign Up</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/login">Log In</a>
+          </li>
+          </li>
+        </ul>
+        
+      </nav>
+
+      {% else %}
+   
+      <nav class="navbar my-nav" style="background-color: #8b0707;">
+
+        <ul class="nav">
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="/">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/user/{{g.user.id}}/gamelist">My Gamelist</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/user/{{g.user.id}}/games">My Games</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/account/user/{{g.user.id}}">Account</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/logout">Logout</a>
+          </li>
+        </ul>
+      </nav>
       {% endif %}
 
 
-    </ul>
-  </div>
-
-  
-</nav>
 <div class="container">
   {% for category, message in get_flashed_messages(with_categories=True) %}
   <div class="alert alert-{{ category }}">{{ message }}</div>
   {% endfor %}
 
-  <!-- Added this for testing -->
-
-  <div>
-    {% for msg in get_flashed_messages() %}
-    <div>{{ msg }}</div>
-    {% endfor %}
-  </div>
 
   {% block content %}
   {% endblock %}

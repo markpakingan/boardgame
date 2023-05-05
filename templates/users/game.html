@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    <h1>About {{game.name}} : </h1>
+    <hr>
+
+
+    <p>This game is in the following gamelist:</p>
+    <ul>
+
+    {% for gamelist in gamelists %}
+
+        <li>
+        <div class="gamelist-title">
+            {{ gamelist.title }} |
+        </div>
+            
+        <div class="small-delete-button">
+            <form action="/user/{{ g.user.id }}/games/{{ game.id }}/gamelist/{{ gamelist.id }}/delete" method="post">
+                <input type="hidden" name="_method" value="DELETE">
+                <button type="submit">Delete</button>
+            </form>
+        </div>
+        </li>
+
+
+    {% endfor %}
+
+
+    </ul>
+
+    <a href="/user/{{g.user.id}}/games/{{game.id}}/choose-gamelist">
+        <button>
+            Add To Gamelist
+        </button>
+    </a>
+  
+
+{% endblock %}

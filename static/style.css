@@ -1,0 +1,106 @@
+.my-nav .nav-link {
+    color: white;
+  }
+
+
+.my-nav .nav-item:hover .nav-link {
+    color: pink;
+  }
+
+
+.heading {
+    margin-top: 50px;
+}
+
+button {
+    background-color: rgb(3, 3, 132);
+    color: white;
+}
+
+.searchbar input[type="text"] {
+    width: 50%;
+    border: 2px solid  rgb(3, 3, 132);
+    border-radius: 8px;
+
+}
+
+.searchbar button {
+    border-radius: 8px;
+    width: 15%;
+}
+
+input[type="text"] {
+    width: 100%;
+    border: 2px solid  rgb(3, 3, 132);
+    border-radius: 8px;
+}
+
+input[type="password"] {
+    width: 100%;
+    border: 2px solid  rgb(3, 3, 132);
+    border-radius: 8px;
+}
+
+
+.create-link p {
+    border: 2px solid #91c7b1;
+    background-color: #91c7b1;
+    padding: 10px;
+    display: inline-block;
+    color: #8b0707;
+  }
+
+  .create-link a {
+    color: #8b0707;
+  }
+  
+
+.api-image {
+    overflow: hidden;
+    padding: 10px;
+}
+
+button a {
+    color: white;
+}
+
+body {
+    background-image: url("https://img.freepik.com/free-vector/colorful-blocks-blank-white-background-vector_53876-67038.jpg?w=826&t=st=1683089454~exp=1683090054~hmac=a4f7c01fe754b5a4e392e5fa7a126358487e1e02126292089aaba1ff0544c76d");
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center center;
+}
+
+
+ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+  
+ul li {
+    margin-bottom: 10px;
+}
+
+img {
+    max-height: 500px;
+}
+
+.gamelist-title {
+    display: inline-block;
+  }
+  
+  .small-delete-button {
+    display: inline-block;
+    margin-left: 10px; /* adjust the margin to your preference */
+  }
+
+
+.small-delete-button button {
+    /* padding: 5px 10px; */
+    font-size: 0.8em;
+    color: white;
+    background-color: #8b0707;
+
+  }
+  

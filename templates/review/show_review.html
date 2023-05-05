@@ -1,0 +1,17 @@
+{% extends "base.html"%}
+
+
+{% block content %}
+
+
+<h1>{{gamelist.name}} Review</h1>
+<p>By: {{username}}</p>
+<h2>Rating: {{review.rating}}</h2>
+
+<h2>Feedback: {{review.feedback}}</h2>
+
+<a href="/gamelist/{{gamelist.id}}/review/edit"><p>Edit Review</p></a>
+<a href="/gamelist/{{gamelist.id}}/review/add"><p>Add Review</p></a>
+
+
+{% endblock %}
