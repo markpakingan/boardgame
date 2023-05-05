@@ -15,7 +15,7 @@ class Game(db.Model):
     __tablename__ = "games"
 
     id = db.Column(db.Integer, primary_key = True, autoincrement = True)
-    game_sku_id = db.Column (db.Text, nullable = True)
+    game_official_id = db.Column (db.Text, nullable = True)
     name = db.Column(db.Text, nullable = False )
     description = db.Column(db.Text, nullable = True )
     lowest_price = db.Column(db.Float, nullable = True )
@@ -50,21 +50,21 @@ class Game_Gamelist (db.Model):
     gamelist_id = db.Column (db.Integer, db.ForeignKey("gamelists.id"), nullable = False)
 
 
-# class Video(db.Model):
+class Video(db.Model):
 
-#     __tablename__= "videos"
+    __tablename__= "videos"
 
-#     id = db.Column(db.Integer, primary_key = True, autoincrement = True)
-#     url = db.Column (db.Text, nullable = False)
-#     games_id = db.Column(db.Integer, db.ForeignKey("games.id"), nullable = False )
+    id = db.Column(db.Integer, primary_key = True, autoincrement = True)
+    url = db.Column (db.Text, nullable = False)
+    games_id = db.Column(db.Integer, db.ForeignKey("games.id"), nullable = False )
 
-# class Image(db.Model):
+class Image(db.Model):
 
-#     __tablename__= "images"
+    __tablename__= "images"
 
-#     id = db.Column(db.Integer, primary_key = True, autoincrement = True)
-#     url = db.Column (db.Text, nullable = False)
-#     games_id = db.Column(db.Integer, db.ForeignKey("games.id"), nullable = False )
+    id = db.Column(db.Integer, primary_key = True, autoincrement = True)
+    url = db.Column (db.Text, nullable = False)
+    games_id = db.Column(db.Integer, db.ForeignKey("games.id"), nullable = False )
 
 class Review(db.Model):
 

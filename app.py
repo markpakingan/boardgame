@@ -505,12 +505,15 @@ def add_selected_game(game_official_id):
         name = form.name.data
         description = form.description.data
 
-        game = Game(name=name, description=description, user_id=user_id)
+        game = Game(name=name, description=description,
+                     user_id=user_id)
 
         db.session.add(game)
         db.session.commit()
 
-        return redirect("/")
+        return redirect(f"/user/{user_id}/games/{game.id}/choose-gamelist")
+    
+
 
     else:
         return render_template("boardgames/add_single_game.html", form=form,
@@ -521,7 +524,7 @@ def add_selected_game(game_official_id):
 ##############################################################################
 # REVIEW ROUTE
 
-@app.route('users/<int:user_id>/games/<int:game_id>/review')
+@app.route('/gamelist/<int:gamelist_id>/review')
 def show_review(gamelist_id):
     """Shows the review of a game"""
 
