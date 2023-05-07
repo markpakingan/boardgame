@@ -303,7 +303,7 @@ def add_game_to_gamelist(user_id, game_id):
         db.session.commit()
         return redirect (f"/user/{g.user.id}/games/{game_id}")
     
-    return render_template("users/pick_playlist.html",
+    return render_template("users/choose_gamelist.html",
                              games=games,
                              form=form)
 
@@ -369,7 +369,7 @@ def show_gamelist_info(user_id, gamelist_id):
 
 
 @app.route('/user/<int:user_id>/gamelist/add', methods = ["GET", "POST"])
-def add_user_games(user_id):
+def create_new_gamelist(user_id):
     """creates new gameslist for a user"""
 
     if g.user.id != user_id:
@@ -378,7 +378,7 @@ def add_user_games(user_id):
     
 
     form = GameListForm()
-
+    
     if form.validate_on_submit():
         title = form.title.data
         description = form.description.data
@@ -389,8 +389,10 @@ def add_user_games(user_id):
         db.session.add(gamelist)
         db.session.commit()
 
-        
-        return redirect(f"/user/{g.user.id}/gamelist")
+
+
+        # for testing
+        return redirect(f"/user/{g.user.id}/games")
     
     else: 
 
@@ -478,47 +480,24 @@ def get_boardgamelist():
     return render_template("home.html", name_and_id = name_and_id)
 
 
-@app.route('/game/<game_official_id>')
+@app.route('/game/<game_official_id>', methods = ["GET", "POST"])
 def show_selected_game(game_official_id):
     """show details for a chosen boardgame"""
 
     game_details = get_gameinfo(game_official_id)
 
+
+    games = Game(name=game_details["name"], game_official_id = game_official_id, 
+                 user_id = g.user.id)
+    
+    db.session.add(games)
+    db.session.commit()
+    
+    
     return render_template ('boardgames/game_description.html',
                            game_details = game_details, 
-                           game_official_id=game_official_id
-                           )
-
-@app.route('/game/<game_official_id>/add', methods = ["GET", "POST"])
-def add_selected_game(game_official_id):
-
-
-    #get the data form API
-    game_details = get_gameinfo(game_official_id)
-
-    user_id = g.user.id
-       
-    form = SingleGameForm(name=game_details["name"],
-                          description=game_details["description"])
-
-    if form.validate_on_submit():
-        name = form.name.data
-        description = form.description.data
-
-        game = Game(name=name, description=description,
-                     user_id=user_id)
-
-        db.session.add(game)
-        db.session.commit()
-
-        return redirect(f"/user/{user_id}/games/{game.id}/choose-gamelist")
-    
-
-
-    else:
-        return render_template("boardgames/add_single_game.html", form=form,
-                               game_details = game_details["name"])
-
+                           game_official_id=game_official_id,
+                           games=games)
 
 
 ##############################################################################

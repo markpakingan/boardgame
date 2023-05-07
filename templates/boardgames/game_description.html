@@ -18,7 +18,7 @@
                 <br>
 
                 <button> 
-                        <a href="/game/{{game_official_id}}/add">Add This Game
+                        <a href="/user/{{g.user.id}}/games/{{games.id}}/choose-gamelist">Add To Gamelist
                         </a>
                 </button>
 
@@ -35,17 +35,5 @@
                 <li><b> MSRP: </b>{{game_details["msrp"]}}</li>
                 <li><b> Mechanics: </b>{{game_details["mechanics"]}}</li>
         </ul>
-
-        <!-- {% endif %}
-
-
-        {% if video_list %}
-
-        {{video_list["video"]}}
-        {{video_list["video1"]}}
-        {{video_list["video2"]}}
-
-        {% endif %} -->
-
 
 {% endblock %}
